@@ -1,0 +1,91 @@
+<style>
+.director-message-section {
+    display: flex;
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 20px;
+    gap: 60px;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+}
+.director-image-container {
+    flex: 1;
+    position: relative;
+}
+.director-image-container img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    display: block;
+}
+.quote-icon {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #D4AF37;
+    color: white;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-family: serif;
+    border-radius: 4px;
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4);
+}
+.director-text-container {
+    flex: 1.2;
+}
+.director-subtitle {
+    color: #D4AF37;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.director-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+.director-body {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.8;
+}
+.director-body p {
+    margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+    .director-message-section {
+        flex-direction: column;
+    }
+    .quote-icon {
+        right: 20px;
+        bottom: -20px;
+        top: auto;
+        transform: none;
+    }
+}
+</style>
+
+<div class="director-message-section">
+    <div class="director-image-container">
+        <img src="../wp-content/uploads/director_portrait.png" alt="Message from the Director">
+        <div class="quote-icon">“</div>
+    </div>
+    <div class="director-text-container">
+        <div class="director-subtitle">Message from the Director</div>
+        <h2 class="director-title">Every journey deserves thoughtful planning, honest guidance, and a team that truly cares.</h2>
+        <div class="director-body">
+            <p>Thank you for trusting Pentagon Quest as your travel partner. It is a privilege to help you, your family, your team, or your clients discover places and experiences that stay with you long after the journey ends.</p>
+            <p>Whether you are planning a weekend escape, a family holiday, a safari, an international trip, or a corporate program, my promise is simple: we will listen carefully, plan professionally, and handle the details with the seriousness your travel deserves.</p>
+        </div>
+    </div>
+</div>

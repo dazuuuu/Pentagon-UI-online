@@ -1,0 +1,152 @@
+/*
+Theme Name: LoveTravel
+Theme URI: http://www.nicdark.com
+Description: Wonderful theme for your Business.
+Author: Nicdark
+Author URI: http://www.nicdarkthemes.com
+Version: 5.6
+License: http://www.nicdarkthemes.com
+License URI: http://www.nicdarkthemes.com
+Tags: one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, microformats, post-formats, rtl-language-support, sticky-post, translation-ready, accessibility-ready
+Text Domain: lovetravel
+*/
+
+/* 1 ------------------------------------------------------- THEME STRUCTURE ------------------------------------------------------- */
+
+/* 1.1 body */
+body { margin:0px; padding:0px; overflow-x: hidden;  }
+
+
+/*navigation*/
+.nicdark_navigation ul { margin: 0px; padding: 0px; list-style: none; text-align: center; }
+.nicdark_navigation ul li { margin: 0px; padding: 0px; display: inline; }
+.nicdark_navigation ul li a { color: #fff;text-decoration: none; font-size: 20px;padding: 0px 20px; }
+
+/*post preview on archive*/
+.nicdark_archive_post_preview { text-align: center; padding-bottom: 70px; }
+.nicdark_archive_post_preview img {  width: 100%; height: auto; }
+.nicdark_archive_post_preview a { color:#000; }
+
+/*sticky*/
+.nicdark_archive_post_preview .sticky { background-color: #8fb1a6; padding: 40px; color: #fff;  }
+.nicdark_archive_post_preview .sticky a { color: #fff;  }
+
+/*single post*/
+body.single-post .nicdark_single_post .has-post-thumbnail img { width:100%; height: auto; padding-bottom: 20px; }
+.nicdark_single_post_tag_cat { padding:20px 0px; }
+.nicdark_single_post_tag_cat a { text-decoration: none; color: #000; }
+.nicdark_single_post_tag, .nicdark_single_post_cat { margin:5px 0px; }
+.nicdark_single_post_comments { padding-bottom: 120px; padding-top:10px;  }
+.nicdark_single_post_comments label { float: left; width: 100%; box-sizing: border-box; margin:5px 0px; }
+.nicdark_single_post_comments a { text-decoration: none; color: #000;  }
+.nicdark_single_post_comments input[type="text"],.nicdark_single_post_comments textarea { float: left; width: 100%; box-sizing: border-box; padding:5px 10px; margin:5px 0px;  }
+.nicdark_single_post_comments input[type="submit"] { float: left; box-sizing: border-box; padding:10px 20px; margin:5px 0px; background-color:#8fb1a6; color: #fff; border-radius: 0px; border:0px solid #fff; }
+
+/*single page*/
+.nicdark_single_page a { text-decoration: underline; color: #000; }
+
+/*container*/
+.nicdark_container{ width:1200px; margin:auto; padding: 0px; }
+
+/*wordpress class*/
+.wp-caption {  }
+.wp-caption-text {  }
+.screen-reader-text {  }
+.gallery-caption {  }
+.bypostauthor {  }
+.alignright {  }
+.alignleft {  }
+.aligncenter {  }
+
+/*class*/
+.nicdark_section { float: left; width: 100%; box-sizing: border-box;  }
+
+.nicdark_margin_0 { margin: 0px;  }
+.nicdark_margin_top_10 { margin-top: 10px;  }
+.nicdark_margin_top_15 { margin-top: 15px;  }
+.nicdark_margin_top_15_important { margin-top: 15px !important;  }
+.nicdark_margin_top_20 { margin-top: 20px;  }
+.nicdark_margin_top_25 { margin-top: 25px;  }
+.nicdark_margin_top_30 { margin-top: 30px;  }
+.nicdark_margin_bottom_10 { margin-bottom: 10px; }
+
+.nicdark_margin_left_10 { margin-left: 10px; }
+.nicdark_margin_left_20_percentage { margin-left: 20%; }
+
+.nicdark_padding_0 { padding: 0px;  }
+.nicdark_padding_20 { padding: 20px;  }
+.nicdark_padding_8_20 { padding: 8px 20px; }
+.nicdark_padding_top_120 { padding-top: 120px;  }
+
+.nicdark_padding_bottom_120 { padding-bottom: 120px;  }
+.nicdark_padding_bottom_50 { padding-bottom: 50px;  }
+
+.nicdark_padding_right_20 { padding-right: 20px; }
+
+.nicdark_padding_left_2 { padding-left: 2px; }
+
+.nicdark_background_color_8fb1a6 { background-color: #8fb1a6; }
+.nicdark_background_color_E7E7E7 {  background-color: #e7e7e7; }
+.nicdark_background_color_1d2327 {  background-color: #1d2327; }
+.nicdark_background_color_ffffff { background-color:#fff; }
+.nicdark_background_color_2c3338 { background-color:#2c3338; }
+.nicdark_background_color_2271b1 { background-color:#2271b1; }
+.nicdark_background_color_1bbc9b { background-color:#1bbc9b; }
+
+
+
+.nicdark_box_shadow_0_1_1_000_4 { box-shadow: 0 1px 1px rgb(0 0 0 / 4%);  }
+
+.nicdark_display_inline_block { display: inline-block;  }
+.nicdark_display_block { display: block;  }
+
+.nicdark_box_sizing_border_box { box-sizing: border-box;  }
+
+.nicdark_text_align_center { text-align: center;  }
+
+.nicdark_float_left { float: left; }
+
+
+.nicdark_border_1_solid_e5e5e5 { border:1px solid #e5e5e5; }
+.nicdark_border_1_solid_e5e5e5 { border:1px solid #e5e5e5; }
+.nicdark_border_bottom_1_solid_cccccc { border-bottom: 1px solid #cccccc; }
+.nicdark_border_bottom_3_solid_2271b1 { border-bottom:3px solid #2271b1; }
+.nicdark_border_top_width_0 { border-top-width:0px;  }
+.nicdark_border_left_width_0 { border-left-width:0px;   }
+
+
+.nicdark_cursor_auto { cursor: auto;  }
+
+.nicdark_color_ffffff { color: #ffffff; }
+.nicdark_color_666666 { color: #666666;  }
+.nicdark_color_a0a5aa { color: #a0a5aa;  }
+
+
+.nicdark_width_20_percentage { width: 20%;  }
+.nicdark_width_40_percentage { width: 40%;  }
+.nicdark_width_50_percentage { width: 50%;  }
+.nicdark_width_80_percentage { width: 80%;  }
+.nicdark_width_100_percentage { width: 100%;  }
+
+.nicdark_height_1 { height: 1px;  }
+.nicdark_min_height_3000 { min-height: 3000px; }
+
+.nicdark_text_decoration_none { text-decoration:none;  }
+
+.nicdark_overflow_hidden { overflow: hidden; }
+
+.nicdark_position_relative { position: relative; }
+.nicdark_position_absolute { position: absolute; }
+
+.nicdark_list_style_none { list-style: none; }
+
+.nicdark_font_size_14px { font-size: 14px; }
+
+
+/* 2 ------------------------------------------------------- ELEMENTOR ------------------------------------------------------- */
+
+/*slides and carousel*/
+.elementor-swiper-button-prev { left: 10px; }
+.elementor-swiper-button { position: absolute;display: inline-flex;z-index: 1;cursor: pointer;font-size: 25px;color: hsla(0,0%,93.3%,.9);top: 50%;transform: translateY(-50%);}
+.elementor-swiper-button-next {right: 10px;}
+.swiper-container {margin-left: auto;margin-right: auto;position: relative;overflow: hidden;z-index: 1;}
