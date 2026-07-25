@@ -3,23 +3,19 @@
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-
-  # Uncomment if rewrites fail in a subfolder install:
-  # RewriteBase "/Pentagon Quest UI/"
+  RewriteBase /Pentagon%20Quest%20UI/
 
   # Never expose backend / tooling
   RewriteRule ^(?:apps|scripts|_old_scaffold|\.git)(?:/|$) - [F,L]
 
-  # Let the handler and existing root files run as-is
+  # Let the handler (and PATH_INFO) run as-is
   RewriteRule ^path-handler\.php(?:/.*)?$ - [L]
 
-  # If the request already maps to a real file/dir at project root, keep it
-  # (except we still want /admin /devs etc. to go through the handler when
-  # those are only empty rewrite stubs)
+  # Existing root PHP proxies (admin/*.php, devs/*.php, …) run directly
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # Send everything else into /public via the path handler
+  # Everything else (static pages, CSS under public/, pretty URLs) → handler
   RewriteRule ^(.*)$ path-handler.php [QSA,L]
 </IfModule>
 

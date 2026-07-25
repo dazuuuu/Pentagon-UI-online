@@ -10,11 +10,15 @@ Travel website with a full PHP backend. The web root folder name is **`Pentagon 
 
 ## Local AMPPS / XAMPP
 
-Put `public/` contents into `www/Pentagon Quest UI/`, keep `apps/` beside that folder (or one level above).
+Put the **whole project** into `www/Pentagon Quest UI/`.  
+`path-handler.php` (+ root `.htaccess`) maps `/admin`, `/devs`, `/client`, `/api`, and pages into `public/`.
 
 1. `http://localhost/Pentagon Quest UI/admin/migrate.php`
 2. `http://localhost/Pentagon Quest UI/devs/register.php` — create first admin
 3. `http://localhost/Pentagon Quest UI/admin/login.php` — sign in
+
+Fallback (if rewrite is off):  
+`http://localhost/Pentagon Quest UI/path-handler.php/admin/login.php`
 
 ## PHP built-in server
 
