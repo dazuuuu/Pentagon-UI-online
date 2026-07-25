@@ -1,28 +1,32 @@
 <?php
 /**
- * Router for PHP built-in server:
+ * Local dev server router — mirrors how Apache serves the site once
+ * `public/` is uploaded as the cPanel document root:
  *   php -S localhost:8080 router.php
  */
-$uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/');
-$file = __DIR__ . $uri;
+$publicRoot = __DIR__ . '/public';
+$uri = '/' . ltrim(urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/'), '/');
+$file = $publicRoot . $uri;
 
 if ($uri !== '/' && is_file($file)) {
-    return false; // serve static file
+    return false; // let the built-in server serve/execute it directly
 }
 
-// Directory index
 if (is_dir($file)) {
     foreach (['index.php', 'index.html'] as $index) {
-        if (is_file(rtrim($file, '/') . '/' . $index)) {
+        $indexFile = rtrim($file, '/') . '/' . $index;
+        if (is_file($indexFile)) {
+            $_SERVER['SCRIPT_NAME'] = rtrim($uri, '/') . '/' . $index;
             if (str_ends_with($index, '.php')) {
-                require rtrim($file, '/') . '/' . $index;
-                return true;
+                chdir(dirname($indexFile));
+                require $indexFile;
+            } else {
+                readfile($indexFile);
             }
-            return false;
+            return true;
         }
     }
 }
 
 http_response_code(404);
 echo '404 Not Found';
-return true;

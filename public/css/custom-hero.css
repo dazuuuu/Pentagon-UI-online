@@ -1,0 +1,338 @@
+/* Elementor page-transition preloader and popup templates are normally
+   shown/hidden entirely by JS (triggers, entrance animations). That JS
+   never runs in this static mirror, and neither has any CSS hiding it by
+   default here, so they can sit on the page as full, un-hidden blocks —
+   forcibly hide them so nothing can sit on top of real content. */
+e-page-transition,
+.elementor-location-popup {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* Custom Hero Section */
+.custom-hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 700px;
+    background-image: url('../wp-content/uploads/safari-hero.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    overflow: hidden;
+}
+
+/* Header overlay */
+.hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 50px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+    z-index: 10;
+}
+
+.hero-search-icon {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.hero-nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.hero-nav a {
+    position: relative;
+    color: #fff;
+    text-decoration: none;
+    text-transform: lowercase;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+
+.hero-nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 2px;
+    background: #D4AF37;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.hero-nav a:hover {
+    color: #D4AF37;
+}
+
+.hero-nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.hero-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 40px;
+    text-transform: capitalize;
+}
+
+.hero-logo img {
+    height: 52px;
+    width: auto;
+    background: none;
+    display: block;
+}
+
+.hero-contact {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Center Text */
+.hero-center {
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-title {
+    font-size: 10vw;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 10px;
+    margin: 0;
+    line-height: 1;
+    text-shadow: 2px 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Bottom Search Bar */
+.hero-bottom {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 50px;
+}
+
+.hero-search-bar {
+    display: flex;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    gap: 10px;
+    align-items: center;
+    width: 90%;
+    max-width: 1000px;
+}
+
+.search-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+    border-right: 1px solid #eee;
+}
+
+.search-field:last-of-type {
+    border-right: none;
+}
+
+.search-field label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.search-field input, .search-field select {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #000;
+    width: 100%;
+    background: transparent;
+    font-family: inherit;
+}
+
+.search-btn {
+    background-color: #D4AF37; /* Gold */
+    color: #fff;
+    border: none;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    height: 100%;
+}
+
+.search-btn:hover {
+    background-color: #b8972e;
+}
+
+/* Enhance Content Cards globally */
+.elementor-post,
+.elementor-grid-item,
+article.post {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    background: #fff !important;
+    border: 1px solid #f0f0f0 !important;
+}
+
+.elementor-post:hover,
+.elementor-grid-item:hover,
+article.post:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+}
+
+.elementor-post__thumbnail img,
+.elementor-post__thumbnail iframe,
+.elementor-grid-item img {
+    height: 250px !important;
+    object-fit: cover !important;
+    width: 100% !important;
+}
+
+.elementor-post__text,
+.elementor-grid-item .elementor-widget-container {
+    padding: 20px !important;
+}
+
+/* Testimonials carousel — the jeg-elementor-kit carousel plugin never
+   initializes outside a live WordPress context (its runtime JS classes
+   never get applied), so its cards had no CSS-defined width at all.
+   This is a real slide-by-group carousel instead (3 cards per slide on
+   desktop, 2 tablet, 1 mobile), driven by a small script in index.html. */
+.jkit-testimonials .testimonials-list {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 56px;
+}
+
+.jkit-testimonials .testimonials-viewport {
+    overflow: hidden;
+}
+
+.jkit-testimonials .testimonials-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 20px !important;
+    margin: 0 !important;
+    transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: transform;
+}
+
+.jkit-testimonials .testimonial-item {
+    flex: 0 0 calc((100% - 40px) / 3) !important;
+    max-width: calc((100% - 40px) / 3) !important;
+    margin: 0 !important;
+    opacity: 0.35;
+    transform: scale(0.96);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.jkit-testimonials .testimonial-item.pq-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.jkit-testimonials .testimonial-box {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.jkit-testimonials .pq-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    color: #D4AF37;
+    box-shadow: 0 3px 15px rgba(0,0,0,.16);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    z-index: 2;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.jkit-testimonials .pq-arrow:hover {
+    background: #D4AF37;
+    color: #fff;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.jkit-testimonials .pq-arrow-prev { left: 0; }
+.jkit-testimonials .pq-arrow-next { right: 0; }
+
+.jkit-testimonials .pq-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.jkit-testimonials .pq-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.jkit-testimonials .pq-dot.pq-active {
+    background: #D4AF37;
+    transform: scale(1.3);
+}
+
+@media (max-width: 1024px) {
+    .jkit-testimonials .testimonial-item {
+        flex: 0 0 calc((100% - 20px) / 2) !important;
+        max-width: calc((100% - 20px) / 2) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .jkit-testimonials .testimonials-list {
+        padding: 0 44px;
+    }
+    .jkit-testimonials .testimonial-item {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+    .jkit-testimonials .pq-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}

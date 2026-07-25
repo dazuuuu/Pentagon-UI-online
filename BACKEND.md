@@ -2,7 +2,36 @@
 
 Fully working backend for the Pentagon Quest travel site: admin panel, client tour tracking, SMTP, migrations, and public APIs.
 
-## Quick start
+## Folder layout
+
+```
+public/          <- becomes your cPanel document root (public_html)
+  index.html       static homepage + all the scraped static pages
+  destinations/, packages/, about-us/, ...
+  css/, js/, wp-content/, wp-includes/
+  uploads/         web-accessible upload storage
+  admin/           admin panel (PHP)
+  client/          client portal (PHP)
+  api/             public JSON endpoints (PHP)
+
+apps/             <- stays OUTSIDE the web root, not browsable
+  backend/
+    bootstrap.php
+    config.php     DB / SMTP / app config
+    lib/           Auth, Database, Mailer, Migrator, Settings, helpers
+    migrations/
+  data/            SQLite DB file lives here if you use the sqlite driver
+
+scripts/          one-off maintenance scripts (not deployed, not web-served)
+```
+
+`public/admin`, `public/client`, and `public/api` all `require` the shared
+engine from `apps/backend/bootstrap.php` (two directories up). They must
+stay web-accessible since the browser hits them directly (each has its own
+login/auth), while `apps/` holds the sensitive bits — DB credentials,
+shared classes, migrations — that never need to be requested by URL.
+
+## Quick start (local)
 
 ```bash
 # 1) Start PHP server from the project root
@@ -19,6 +48,33 @@ http://localhost:8080/admin/login.php
 ```
 
 Client portal: `http://localhost:8080/client/login.php`
+
+`router.php` simply mirrors what Apache does in production: it serves
+everything out of `public/`, so `php -S localhost:8080 -t public` also
+works directly without the router script.
+
+## Deploying to cPanel
+
+1. Upload the **contents** of `public/` into your domain's document root
+   (usually `public_html/`, or the docroot you set for an add-on/subdomain).
+2. Upload `apps/` as a **sibling** of `public_html` — i.e. one level above
+   it, in your account's home directory — so it sits outside the web root
+   and can't be requested by URL. Example layout on the server:
+   ```
+   /home/youruser/
+     apps/               <- from this repo's apps/
+     public_html/        <- contents of this repo's public/
+   ```
+   If your host lets you pick a custom document root for the domain,
+   you can instead upload the whole repo and just point the docroot at
+   `public/` — then `apps/` is automatically outside the served path.
+3. Create a MySQL database + user in cPanel, then edit
+   `apps/backend/config.php` (or set `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASS`
+   env vars) with those credentials.
+4. Visit `/admin/migrate.php` once to create the schema, then
+   `/admin/register.php` to create the first admin.
+5. Make sure `apps/data/` (if using SQLite) and `public/uploads/` are
+   writable by the PHP process.
 
 ## Features
 
@@ -40,19 +96,13 @@ Client portal: `http://localhost:8080/client/login.php`
 
 ## Database
 
-Default is **SQLite** at `data/pentagon_quest.sqlite` (no MySQL required).
+Default driver is **MySQL** (`apps/backend/config.php`), reading
+`DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASS` env vars with
+`127.0.0.1` / `root` / (empty) as local fallbacks.
 
-To use MySQL, edit `backend/config.php`:
-
-```php
-'db' => [
-    'driver' => 'mysql',
-    'host' => 'localhost',
-    'database' => 'pentagon_quest',
-    'username' => 'root',
-    'password' => '',
-],
-```
+To use SQLite instead, set `'driver' => 'sqlite'` in
+`apps/backend/config.php`. The file lives at `apps/data/pentagon_quest.sqlite`
+(outside the web root either way).
 
 ## SMTP
 
@@ -68,7 +118,7 @@ The site posts inquiries to `POST /api/contact.php`. Responses appear in **Admin
 
 ## Production notes
 
-- Point the web root at this project (Apache/Nginx with PHP).
-- Ensure `data/` and `uploads/` are writable by the PHP user.
+- Point the web root at `public/` (Apache/Nginx with PHP).
+- Ensure `apps/data/` and `public/uploads/` are writable by the PHP user.
 - Restrict `/admin/migrate.php` after go-live if desired.
 - Prefer HTTPS so session cookies stay secure.

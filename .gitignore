@@ -1,8 +1,8 @@
-/data/*
-!/data/.gitkeep
+/apps/data/*
+!/apps/data/.gitkeep
 *.sqlite
 *.sqlite-journal
-/uploads/*
-!/uploads/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
 .env
-backend/config.local.php
+apps/backend/config.local.php
