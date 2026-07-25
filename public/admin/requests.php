@@ -86,9 +86,9 @@ require __DIR__ . '/includes/header.php';
     <p>Inquiries from the contact form and newsletter leads.</p>
   </div>
   <div class="actions">
-    <a class="btn btn-secondary btn-sm" href="/admin/requests.php">All</a>
-    <a class="btn btn-secondary btn-sm" href="/admin/requests.php?status=new">New</a>
-    <a class="btn btn-secondary btn-sm" href="/admin/requests.php?status=in_progress">In progress</a>
+    <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/requests.php')) ?>">All</a>
+    <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/requests.php?status=new')) ?>">New</a>
+    <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/requests.php?status=in_progress')) ?>">In progress</a>
   </div>
 </div>
 
@@ -96,7 +96,7 @@ require __DIR__ . '/includes/header.php';
 <div class="panel">
   <div class="panel-head">
     <h2>Request #<?= (int)$view['id'] ?> · <?= e($view['name']) ?></h2>
-    <a href="/admin/requests.php">Back to list</a>
+    <a href="<?= e(url('admin/requests.php')) ?>">Back to list</a>
   </div>
   <div class="form-grid">
     <div><label>Email</label><div><?= e($view['email']) ?></div></div>
@@ -160,7 +160,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= status_badge($r['status']) ?></td>
           <td><?= e($r['created_at']) ?></td>
           <td class="actions">
-            <a class="btn btn-secondary btn-sm" href="/admin/requests.php?id=<?= (int)$r['id'] ?>">Open</a>
+            <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/requests.php?id=<?= (int)$r['id'] ?>')) ?>">Open</a>
             <form method="post" onsubmit="return confirm('Delete request?')">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="delete">

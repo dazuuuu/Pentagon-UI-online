@@ -1,0 +1,24 @@
+# Pentagon Quest UI – Apache rules for the web root folder
+# Place the *contents* of public/ into your "Pentagon Quest UI" folder (or public_html).
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # If this folder is a subdir (e.g. /Pentagon Quest UI/), Apache sets the
+  # rewrite base automatically when AllowOverride is on. Uncomment and adjust
+  # only if redirects loop or assets 404:
+  # RewriteBase "/Pentagon Quest UI/"
+
+  # Serve existing files/dirs as-is
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Directory indexes
+  DirectoryIndex index.php index.html
+</IfModule>
+
+# Block access to sensitive leftovers if accidentally uploaded
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>

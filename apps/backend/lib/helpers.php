@@ -24,6 +24,56 @@ function config(?string $key = null, $default = null)
     return $val;
 }
 
+/**
+ * URL prefix for the site when it lives in a subfolder.
+ * Default / configured root folder: "Pentagon Quest UI"
+ * Example: http://localhost/Pentagon%20Quest%20UI/admin/login.php
+ */
+function base_path(): string
+{
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $configured = config('base_path', null);
+    if (is_string($configured) && $configured !== '') {
+        $cached = rtrim(str_replace('\\', '/', $configured), '/');
+        if ($cached === '/' || $cached === '.') {
+            $cached = '';
+        }
+        return $cached;
+    }
+
+    $script = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    if (preg_match('#^(.*?)/(?:admin|client|api|devs)(?:/|$)#', $script, $m)) {
+        $cached = $m[1];
+        return $cached;
+    }
+
+    // Fallback for local AMPPS/XAMPP folder name when auto-detect is unavailable
+    $cached = '/Pentagon Quest UI';
+    return $cached;
+}
+
+/**
+ * Build a site-root-relative URL under the configured base path.
+ * url('admin/login.php') => /Pentagon Quest UI/admin/login.php
+ */
+function url(string $path = ''): string
+{
+    if (preg_match('#^(https?:)?//#i', $path) || str_starts_with($path, 'mailto:') || str_starts_with($path, 'tel:')) {
+        return $path;
+    }
+
+    $base = base_path();
+    $path = ltrim($path, '/');
+    if ($path === '') {
+        return $base === '' ? '/' : $base . '/';
+    }
+    return ($base === '' ? '' : $base) . '/' . $path;
+}
+
 function app_url(string $path = ''): string
 {
     $base = rtrim((string)config('app_url'), '/');
@@ -31,10 +81,10 @@ function app_url(string $path = ''): string
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $base = ($https ? 'https' : 'http') . '://' . $host;
+        $base = ($https ? 'https' : 'http') . '://' . $host . base_path();
     }
-    $path = '/' . ltrim($path, '/');
-    return $base . ($path === '/' ? '' : $path);
+    $path = ltrim($path, '/');
+    return $path === '' ? $base : $base . '/' . $path;
 }
 
 function e(?string $value): string
@@ -42,9 +92,13 @@ function e(?string $value): string
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function redirect(string $url): never
+function redirect(string $to): never
 {
-    header('Location: ' . $url);
+    // Rewrite site-absolute paths so subdirectory installs keep working
+    if ($to !== '' && $to[0] === '/' && !str_starts_with($to, '//') && !preg_match('#^https?://#i', $to)) {
+        $to = url($to);
+    }
+    header('Location: ' . $to);
     exit;
 }
 

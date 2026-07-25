@@ -65,7 +65,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2><?= $edit ? 'Edit client' : 'Add client' ?></h2><?php if ($edit): ?><a href="/admin/clients.php">Cancel</a><?php endif; ?></div>
+  <div class="panel-head"><h2><?= $edit ? 'Edit client' : 'Add client' ?></h2><?php if ($edit): ?><a href="<?= e(url('admin/clients.php')) ?>">Cancel</a><?php endif; ?></div>
   <form method="post" class="form-grid">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save">
@@ -106,7 +106,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= (int)$r['booking_count'] ?></td>
           <td><?= status_badge($r['is_active'] ? 'active' : 'inactive') ?></td>
           <td class="actions">
-            <a class="btn btn-secondary btn-sm" href="/admin/clients.php?edit=<?= (int)$r['id'] ?>">Edit</a>
+            <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/clients.php?edit=<?= (int)$r['id'] ?>')) ?>">Edit</a>
             <form method="post" onsubmit="return confirm('Delete client and their bookings?')">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="delete">

@@ -33,7 +33,7 @@ $app = config('app_name', 'Pentagon Quest');
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>">
 </head>
 <body>
 <div class="auth-wrap">
@@ -57,8 +57,8 @@ $app = config('app_name', 'Pentagon Quest');
       <button class="btn btn-block" type="submit">Sign in</button>
     </form>
     <p style="margin-top:16px;font-size:.9rem">
-      <a href="/admin/forgot-password.php">Forgot password?</a>
-      · <a href="/admin/migrate.php">Run migrations</a>
+      <a href="<?= e(url('admin/forgot-password.php')) ?>">Forgot password?</a>
+      · <a href="<?= e(url('admin/migrate.php')) ?>">Run migrations</a>
     </p>
   </div>
 </div>

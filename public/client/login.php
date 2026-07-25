@@ -41,9 +41,9 @@ require __DIR__ . '/includes/header.php';
       <button class="btn btn-block" type="submit">Sign in</button>
     </form>
     <p style="margin-top:14px;font-size:.9rem">
-      <a href="/client/forgot-password.php">Forgot password?</a> ·
-      <a href="/client/register.php">Create account</a> ·
-      <a href="/client/track.php">Track by code</a>
+      <a href="<?= e(url('client/forgot-password.php')) ?>">Forgot password?</a> ·
+      <a href="<?= e(url('client/register.php')) ?>">Create account</a> ·
+      <a href="<?= e(url('client/track.php')) ?>">Track by code</a>
     </p>
   </div>
 </div>

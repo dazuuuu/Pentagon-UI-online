@@ -6,7 +6,11 @@
 
 return [
     'app_name' => 'Pentagon Quest',
-    'app_url' => '', // Auto-detected if empty, e.g. https://pentagonquest.com
+    'app_url' => '', // Auto-detected if empty, e.g. http://localhost/Pentagon%20Quest%20UI
+    // Web root folder. null/omit = auto-detect from the request (works for
+    // http://localhost/Pentagon Quest UI/... and domain-root installs).
+    // Set explicitly if needed, e.g. '/Pentagon Quest UI' or '' for domain root.
+    'base_path' => getenv('PQ_BASE_PATH') !== false ? getenv('PQ_BASE_PATH') : null,
     'timezone' => 'Africa/Nairobi',
 
     // Database: mysql (default) or sqlite
@@ -39,5 +43,6 @@ return [
     'allow_open_admin_register' => true,
 
     'uploads_path' => dirname(__DIR__, 2) . '/public/uploads',
-    'uploads_url' => '/uploads',
+    // uploads_url is resolved at runtime via url('uploads') so the base folder is included
+    'uploads_url' => 'uploads',
 ];

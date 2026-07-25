@@ -60,7 +60,7 @@ require __DIR__ . '/includes/header.php';
   <div class="progress"><span style="width:<?= (int)$booking['progress_percent'] ?>%"></span></div>
   <div class="help" style="margin-top:8px"><?= (int)$booking['progress_percent'] ?>% complete</div>
   <?php if ($client): ?>
-    <p style="margin-top:14px"><a class="btn" href="/client/booking.php?code=<?= urlencode($booking['tracking_code']) ?>">Open full timeline</a></p>
+    <p style="margin-top:14px"><a class="btn" href="<?= e(url('client/booking.php?code=<?= urlencode($booking['tracking_code']) ?>')) ?>">Open full timeline</a></p>
   <?php else: ?>
     <p style="margin-top:14px" class="help">Sign in to see the full update timeline for your bookings.</p>
   <?php endif; ?>

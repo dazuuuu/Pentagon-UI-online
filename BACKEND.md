@@ -5,7 +5,8 @@ Fully working backend for the Pentagon Quest travel site: admin panel, client to
 ## Folder layout
 
 ```
-public/          <- becomes your cPanel document root (public_html)
+public/          <- becomes your cPanel / AMPPS document root
+                     (folder name: "Pentagon Quest UI" or public_html)
   index.html       static homepage + all the scraped static pages
   destinations/, packages/, about-us/, ...
   css/, js/, wp-content/, wp-includes/
@@ -13,6 +14,7 @@ public/          <- becomes your cPanel document root (public_html)
   admin/           admin panel (PHP)
   client/          client portal (PHP)
   api/             public JSON endpoints (PHP)
+  devs/            admin registration page (PHP)
 
 apps/             <- stays OUTSIDE the web root, not browsable
   backend/
@@ -40,12 +42,15 @@ php -S localhost:8080 router.php
 # 2) Open migrations and run them
 http://localhost:8080/admin/migrate.php
 
-# 3) Register the first admin
-http://localhost:8080/admin/register.php
+# 3) Register the first admin (devs page)
+http://localhost:8080/devs/register.php
 
 # 4) Sign in
 http://localhost:8080/admin/login.php
 ```
+
+When the site lives in the **`Pentagon Quest UI`** folder (AMPPS/XAMPP), prefix every
+path with that folder — full rules are in **[RULES.md](RULES.md)**.
 
 Client portal: `http://localhost:8080/client/login.php`
 
@@ -72,7 +77,7 @@ works directly without the router script.
    `apps/backend/config.php` (or set `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASS`
    env vars) with those credentials.
 4. Visit `/admin/migrate.php` once to create the schema, then
-   `/admin/register.php` to create the first admin.
+   `/devs/register.php` to create the first admin.
 5. Make sure `apps/data/` (if using SQLite) and `public/uploads/` are
    writable by the PHP process.
 
@@ -81,7 +86,7 @@ works directly without the router script.
 | Area | Path | What it does |
 |------|------|----------------|
 | Admin login | `/admin/login.php` | Secure admin authentication |
-| Register admin | `/admin/register.php` | First admin open; later admins require login |
+| Register admin | `/devs/register.php` | First admin open; later admins require login |
 | Migrations | `/admin/migrate.php` | Creates SQLite/MySQL schema + sample data |
 | Travels | `/admin/travels.php` | CRUD destinations |
 | Tours | `/admin/tours.php` | CRUD packages |

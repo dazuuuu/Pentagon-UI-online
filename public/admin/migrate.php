@@ -41,7 +41,7 @@ $app = config('app_name', 'Pentagon Quest');
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>">
 </head>
 <body>
 <?php if ($admin): $pageTitle = 'Migrations'; $active = 'migrate'; require __DIR__ . '/includes/header.php'; else: ?>
@@ -126,7 +126,7 @@ $app = config('app_name', 'Pentagon Quest');
 </div>
 
 <p class="muted" style="margin-top:8px">
-  Next: run <code>devs/register.php</code> locally to create the first admin · <a href="/admin/login.php">Login</a> · Driver: <strong><?= e(Database::driver()) ?></strong>
+  Next: open <a href="<?= e(url('devs/register.php')) ?>"><code>devs/register.php</code></a> to create the first admin · <a href="<?= e(url('admin/login.php')) ?>">Login</a> · Driver: <strong><?= e(Database::driver()) ?></strong>
 </p>
 
 <?php if ($admin): require __DIR__ . '/includes/footer.php'; else: ?>

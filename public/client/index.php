@@ -16,13 +16,13 @@ require __DIR__ . '/includes/header.php';
 <?php if (!$bookings): ?>
   <div class="card empty">
     No tours yet. When Pentagon Quest confirms a booking for your account, it will show up here.
-    You can also <a href="/client/track.php">look up a tracking code</a>.
+    You can also <a href="<?= e(url('client/track.php')) ?>">look up a tracking code</a>.
   </div>
 <?php endif; ?>
 
 <div class="grid">
 <?php foreach ($bookings as $b): ?>
-  <a class="card" href="/client/booking.php?code=<?= urlencode($b['tracking_code']) ?>" style="color:inherit">
+  <a class="card" href="<?= e(url('client/booking.php?code=<?= urlencode($b['tracking_code']) ?>')) ?>" style="color:inherit">
     <div class="meta">
       <span class="badge"><?= e($b['tracking_code']) ?></span>
       <?= status_badge($b['status']) ?>

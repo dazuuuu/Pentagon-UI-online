@@ -20,7 +20,7 @@ $updates = $u->fetchAll();
 $pageTitle = $booking['tracking_code'];
 require __DIR__ . '/includes/header.php';
 ?>
-<p><a href="/client/index.php">← Back to my tours</a></p>
+<p><a href="<?= e(url('client/index.php')) ?>">← Back to my tours</a></p>
 <div class="card">
   <div class="meta">
     <span class="badge"><?= e($booking['tracking_code']) ?></span>

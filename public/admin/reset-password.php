@@ -34,7 +34,7 @@ $app = config('app_name', 'Pentagon Quest');
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reset Password · <?= e($app) ?></title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <link rel="stylesheet" href="<?= e(url('admin/assets/admin.css')) ?>">
 </head>
 <body>
 <div class="auth-wrap">
@@ -56,7 +56,7 @@ $app = config('app_name', 'Pentagon Quest');
       </div>
       <button class="btn btn-block" type="submit">Update password</button>
     </form>
-    <p style="margin-top:16px;font-size:.9rem"><a href="/admin/login.php">Back to login</a></p>
+    <p style="margin-top:16px;font-size:.9rem"><a href="<?= e(url('admin/login.php')) ?>">Back to login</a></p>
   </div>
 </div>
 </body>
