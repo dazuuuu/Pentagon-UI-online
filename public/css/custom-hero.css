@@ -1,12 +1,75 @@
-/* Elementor page-transition preloader and popup templates are normally
-   shown/hidden entirely by JS (triggers, entrance animations). That JS
-   never runs in this static mirror, and neither has any CSS hiding it by
-   default here, so they can sit on the page as full, un-hidden blocks —
-   forcibly hide them so nothing can sit on top of real content. */
-e-page-transition,
-.elementor-location-popup {
-    display: none !important;
-    pointer-events: none !important;
+/* Footer background — independent layer from admin settings
+   (upload or URL). Dark scrim keeps text readable on any image. */
+.elementor-element-fce0653,
+.elementor-location-footer .e-con.e-parent:first-child {
+    position: relative !important;
+    overflow: hidden;
+}
+.pq-footer-bg-override {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+.pq-footer-bg-override::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(8, 22, 16, 0.78) 0%,
+        rgba(8, 22, 16, 0.88) 55%,
+        rgba(8, 22, 16, 0.94) 100%
+    );
+}
+/* Keep footer content above the background + scrim, and force light text */
+.elementor-element-fce0653 > .e-con-inner,
+.elementor-location-footer .e-con.e-parent:first-child > .e-con-inner {
+    position: relative;
+    z-index: 1;
+}
+.elementor-location-footer,
+.elementor-location-footer .elementor-heading-title,
+.elementor-location-footer .elementor-icon-list-text,
+.elementor-location-footer .elementor-text-editor,
+.elementor-location-footer .elementor-text-editor p,
+.elementor-location-footer a,
+.elementor-location-footer i,
+.elementor-location-footer svg {
+    color: #f5f7f4 !important;
+    fill: currentColor;
+}
+.elementor-location-footer a:hover {
+    color: #d4af37 !important;
+}
+.elementor-location-footer .elementor-social-icon {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+.elementor-location-footer .elementor-divider-separator {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* "Our Promise" video/stats section — was white background with dark text.
+   Turned into a proper dark band (matching the video banner beside it) so
+   the text can be white and bold and still be readable. */
+.elementor-element-4583baa9 {
+    background-color: #0A4322 !important;
+}
+.elementor-element-4583baa9 h1,
+.elementor-element-4583baa9 h2,
+.elementor-element-4583baa9 h3,
+.elementor-element-4583baa9 h4,
+.elementor-element-4583baa9 p,
+.elementor-element-4583baa9 .elementor-heading-title,
+.elementor-element-4583baa9 .elementor-counter-title,
+.elementor-element-4583baa9 .elementor-counter-number,
+.elementor-element-4583baa9 .elementor-counter-number-prefix,
+.elementor-element-4583baa9 .elementor-counter-number-suffix {
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 /* Custom Hero Section */
@@ -25,6 +88,52 @@ e-page-transition,
     font-family: 'Poppins', sans-serif;
     color: #fff;
     overflow: hidden;
+}
+.custom-hero .pq-hero-video,
+.custom-hero .pq-hero-video-embed {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+}
+.custom-hero .pq-hero-video-embed iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw;
+    min-height: 100%;
+    min-width: 177.77vh;
+    transform: translate(-50%, -50%);
+    border: 0;
+    pointer-events: none;
+}
+.custom-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.2) 40%,
+        rgba(0, 0, 0, 0.55) 100%
+    );
+    pointer-events: none;
+}
+.custom-hero > *:not(.pq-hero-video):not(.pq-hero-video-embed) {
+    position: relative;
+    z-index: 2;
+}
+.elementor-background-video-hosted {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Header overlay */

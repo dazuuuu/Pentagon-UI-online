@@ -2,7 +2,7 @@
 require_once dirname(__DIR__, 2) . '/apps/backend/bootstrap.php';
 
 if (Auth::client()) {
-    redirect('/client/index.php');
+    redirect(base_path('/client/index.php'));
 }
 
 $error = '';
@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
         if (Auth::attemptClient($email, $password)) {
             flash('success', 'Welcome back.');
-            redirect('/client/index.php');
+            redirect(base_path('/client/index.php'));
         }
         $error = 'Invalid email or password.';
     }
@@ -41,9 +41,9 @@ require __DIR__ . '/includes/header.php';
       <button class="btn btn-block" type="submit">Sign in</button>
     </form>
     <p style="margin-top:14px;font-size:.9rem">
-      <a href="<?= e(url('client/forgot-password.php')) ?>">Forgot password?</a> ·
-      <a href="<?= e(url('client/register.php')) ?>">Create account</a> ·
-      <a href="<?= e(url('client/track.php')) ?>">Track by code</a>
+      <a href="forgot-password.php">Forgot password?</a> ·
+      <a href="register.php">Create account</a> ·
+      <a href="track.php">Track by code</a>
     </p>
   </div>
 </div>

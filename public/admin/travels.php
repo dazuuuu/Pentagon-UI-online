@@ -40,14 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
                 );
             }
         }
-        redirect('/admin/travels.php');
+        redirect(base_path('/admin/travels.php'));
     }
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         $db->prepare('DELETE FROM travels WHERE id = ?')->execute([$id]);
         log_activity('admin', $admin['id'], 'travel_delete', "Deleted travel #{$id}");
         flash('success', 'Travel deleted.');
-        redirect('/admin/travels.php');
+        redirect(base_path('/admin/travels.php'));
     }
 }
 
@@ -71,7 +71,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2><?= $edit ? 'Edit travel' : 'Add travel' ?></h2><?php if ($edit): ?><a href="<?= e(url('admin/travels.php')) ?>">Cancel</a><?php endif; ?></div>
+  <div class="panel-head"><h2><?= $edit ? 'Edit travel' : 'Add travel' ?></h2><?php if ($edit): ?><a href="travels.php">Cancel</a><?php endif; ?></div>
   <form method="post" class="form-grid">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save">
@@ -128,7 +128,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= (int)$r['tour_count'] ?></td>
           <td><?= status_badge($r['status']) ?><?= $r['featured'] ? ' · featured' : '' ?></td>
           <td class="actions">
-            <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/travels.php?edit=<?= (int)$r['id'] ?>')) ?>">Edit</a>
+            <a class="btn btn-secondary btn-sm" href="travels.php?edit=<?= (int)$r['id'] ?>">Edit</a>
             <form method="post" onsubmit="return confirm('Delete this travel?')">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="delete">

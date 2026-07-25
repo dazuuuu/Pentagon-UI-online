@@ -1,21 +1,7 @@
-// Base configuration for API — respects subfolder installs (Pentagon Quest UI)
-function pqBasePath() {
-    if (typeof window !== 'undefined' && window.PQ_BASE_PATH != null) {
-        return String(window.PQ_BASE_PATH).replace(/\/$/, '');
-    }
-    const path = window.location.pathname || '';
-    const markers = ['/admin/', '/client/', '/api/', '/devs/'];
-    for (const marker of markers) {
-        const idx = path.indexOf(marker);
-        if (idx >= 0) return path.slice(0, idx);
-    }
-    // Fallback: project lives in /Pentagon Quest UI/
-    const m = path.match(/^(\/Pentagon(?:%20| )Quest(?:%20| )UI)/i);
-    if (m) return decodeURIComponent(m[1]);
-    return '/Pentagon Quest UI';
-}
-
-const API_BASE_URL = `${pqBasePath()}/api`;
+// Base configuration for API — derived from this module's own resolved URL
+// so it still finds /api correctly whether the site lives at a true domain
+// root or is nested under a subfolder (e.g. Pentagon Quest UI).
+const API_BASE_URL = new URL('../api', import.meta.url).pathname;
 
 export const ApiService = {
     async get(endpoint) {

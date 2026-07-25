@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
             flash('error', 'Failed to send: ' . $mailer->getLastError());
         }
     }
-    redirect('/admin/emails.php');
+    redirect(base_path('/admin/emails.php'));
 }
 
 $logs = $db->query('SELECT * FROM email_logs ORDER BY id DESC LIMIT 40')->fetchAll();
@@ -35,7 +35,7 @@ require __DIR__ . '/includes/header.php';
     <h1>Send email</h1>
     <p>Compose messages via SMTP. Configure credentials under Settings.</p>
   </div>
-  <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/settings.php')) ?>">SMTP settings</a>
+  <a class="btn btn-secondary btn-sm" href="settings.php">SMTP settings</a>
 </div>
 
 <div class="panel">
@@ -90,7 +90,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= e($s['name'] ?: '—') ?></td>
           <td><?= e($s['email']) ?></td>
           <td><?= e($s['created_at']) ?></td>
-          <td><a class="btn btn-secondary btn-sm" href="<?= e(url('admin/emails.php?to=<?= urlencode($s['email']) ?>')) ?>">Email</a></td>
+          <td><a class="btn btn-secondary btn-sm" href="emails.php?to=<?= urlencode($s['email']) ?>">Email</a></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

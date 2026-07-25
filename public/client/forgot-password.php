@@ -56,6 +56,6 @@ require __DIR__ . '/includes/header.php';
     <button class="btn btn-block" type="submit">Send reset link</button>
   </form>
   <?php endif; ?>
-  <p style="margin-top:14px"><a href="<?= e(url('client/login.php')) ?>">Back to login</a></p>
+  <p style="margin-top:14px"><a href="login.php">Back to login</a></p>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'This reset link is invalid or has expired.';
         } else {
             flash('success', 'Password updated. Please sign in.');
-            redirect('/client/login.php');
+            redirect(base_path('/client/login.php'));
         }
     }
 }

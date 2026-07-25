@@ -10,7 +10,7 @@ $booking = $stmt->fetch();
 
 if (!$booking) {
     flash('error', 'Booking not found for your account.');
-    redirect('/client/index.php');
+    redirect(base_path('/client/index.php'));
 }
 
 $u = $db->prepare('SELECT * FROM booking_updates WHERE booking_id = ? ORDER BY id DESC');
@@ -20,7 +20,7 @@ $updates = $u->fetchAll();
 $pageTitle = $booking['tracking_code'];
 require __DIR__ . '/includes/header.php';
 ?>
-<p><a href="<?= e(url('client/index.php')) ?>">← Back to my tours</a></p>
+<p><a href="index.php">← Back to my tours</a></p>
 <div class="card">
   <div class="meta">
     <span class="badge"><?= e($booking['tracking_code']) ?></span>

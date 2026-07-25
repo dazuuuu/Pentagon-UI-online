@@ -28,20 +28,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         } else {
             if (strlen($password) < 8) {
                 flash('error', 'Password must be at least 8 characters for new clients.');
-                redirect('/admin/clients.php');
+                redirect(base_path('/admin/clients.php'));
             }
             $db->prepare('INSERT INTO clients (name, email, phone, password_hash, is_active, created_at) VALUES (?,?,?,?,?,?)')
                 ->execute([$name, $email, $phone, password_hash($password, PASSWORD_DEFAULT), $active, $now]);
             log_activity('admin', $admin['id'], 'client_create', "Created client {$email}");
             flash('success', 'Client created. They can sign in at /client/login.php');
         }
-        redirect('/admin/clients.php');
+        redirect(base_path('/admin/clients.php'));
     }
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         $db->prepare('DELETE FROM clients WHERE id = ?')->execute([$id]);
         flash('success', 'Client deleted.');
-        redirect('/admin/clients.php');
+        redirect(base_path('/admin/clients.php'));
     }
 }
 
@@ -65,7 +65,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2><?= $edit ? 'Edit client' : 'Add client' ?></h2><?php if ($edit): ?><a href="<?= e(url('admin/clients.php')) ?>">Cancel</a><?php endif; ?></div>
+  <div class="panel-head"><h2><?= $edit ? 'Edit client' : 'Add client' ?></h2><?php if ($edit): ?><a href="clients.php">Cancel</a><?php endif; ?></div>
   <form method="post" class="form-grid">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save">
@@ -106,7 +106,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= (int)$r['booking_count'] ?></td>
           <td><?= status_badge($r['is_active'] ? 'active' : 'inactive') ?></td>
           <td class="actions">
-            <a class="btn btn-secondary btn-sm" href="<?= e(url('admin/clients.php?edit=<?= (int)$r['id'] ?>')) ?>">Edit</a>
+            <a class="btn btn-secondary btn-sm" href="clients.php?edit=<?= (int)$r['id'] ?>">Edit</a>
             <form method="post" onsubmit="return confirm('Delete client and their bookings?')">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="delete">

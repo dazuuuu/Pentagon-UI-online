@@ -83,7 +83,7 @@ class Auth
         $admin = self::admin();
         if (!$admin) {
             flash('error', 'Please sign in to continue.');
-            redirect('/admin/login.php');
+            redirect(base_path('/admin/login.php'));
         }
         return $admin;
     }
@@ -93,7 +93,7 @@ class Auth
         $client = self::client();
         if (!$client) {
             flash('error', 'Please sign in to track your tours.');
-            redirect('/client/login.php');
+            redirect(base_path('/client/login.php'));
         }
         return $client;
     }
@@ -125,35 +125,46 @@ class Auth
         }
     }
 
+    /**
+     * Generates a 6-digit OTP for password reset, emailed to the user.
+     * Any previous unused OTP for this account is invalidated first, so
+     * only the most recently requested code is ever valid.
+     */
     public static function createPasswordReset(string $type, string $email): ?string
     {
         $table = $type === 'admin' ? 'admins' : 'clients';
+        $email = strtolower(trim($email));
         $stmt = Database::get()->prepare("SELECT id, name, email FROM {$table} WHERE email = ? LIMIT 1");
-        $stmt->execute([strtolower(trim($email))]);
+        $stmt->execute([$email]);
         $user = $stmt->fetch();
         if (!$user) {
             return null;
         }
 
-        $token = bin2hex(random_bytes(32));
-        $expires = date('Y-m-d H:i:s', time() + 3600);
+        Database::get()->prepare(
+            'UPDATE password_resets SET used_at = ? WHERE user_type = ? AND email = ? AND used_at IS NULL'
+        )->execute([date('Y-m-d H:i:s'), $type, $email]);
+
+        $otp = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $expires = date('Y-m-d H:i:s', time() + 900); // 15 minutes
         Database::get()->prepare(
             'INSERT INTO password_resets (user_type, user_id, email, token, expires_at, created_at)
              VALUES (?, ?, ?, ?, ?, ?)'
-        )->execute([$type, $user['id'], $user['email'], hash('sha256', $token), $expires, date('Y-m-d H:i:s')]);
+        )->execute([$type, $user['id'], $user['email'], hash('sha256', $otp), $expires, date('Y-m-d H:i:s')]);
 
-        return $token;
+        return $otp;
     }
 
-    public static function consumePasswordReset(string $type, string $token, string $newPassword): bool
+    public static function consumePasswordReset(string $type, string $email, string $otp, string $newPassword): bool
     {
-        $hash = hash('sha256', $token);
+        $email = strtolower(trim($email));
+        $hash = hash('sha256', trim($otp));
         $stmt = Database::get()->prepare(
             'SELECT * FROM password_resets
-             WHERE user_type = ? AND token = ? AND used_at IS NULL AND expires_at > ?
+             WHERE user_type = ? AND email = ? AND token = ? AND used_at IS NULL AND expires_at > ?
              ORDER BY id DESC LIMIT 1'
         );
-        $stmt->execute([$type, $hash, date('Y-m-d H:i:s')]);
+        $stmt->execute([$type, $email, $hash, date('Y-m-d H:i:s')]);
         $row = $stmt->fetch();
         if (!$row) {
             return false;
@@ -166,7 +177,7 @@ class Auth
         Database::get()->prepare('UPDATE password_resets SET used_at = ? WHERE id = ?')
             ->execute([date('Y-m-d H:i:s'), $row['id']]);
 
-        log_activity($type, (int)$row['user_id'], 'password_reset', 'Password was reset');
+        log_activity($type, (int)$row['user_id'], 'password_reset', 'Password was reset via OTP');
         return true;
     }
 }

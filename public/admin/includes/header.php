@@ -18,7 +18,7 @@ $app = config('app_name', 'Pentagon Quest');
 <body>
 <div class="layout">
   <aside class="sidebar">
-    <div class="brand"><div class="brand-mark"></div><span><?= e($app) ?></span></div>
+    <div class="brand"><img class="brand-mark" src="assets/logo.png" alt=""><span><?= e($app) ?></span></div>
     <nav class="nav">
       <div class="section-label">Overview</div>
       <a href="index.php" class="<?= ($active ?? '') === 'dashboard' ? 'active' : '' ?>">Dashboard</a>
@@ -26,6 +26,7 @@ $app = config('app_name', 'Pentagon Quest');
       <div class="section-label">Catalog</div>
       <a href="travels.php" class="<?= ($active ?? '') === 'travels' ? 'active' : '' ?>">Travels</a>
       <a href="tours.php" class="<?= ($active ?? '') === 'tours' ? 'active' : '' ?>">Tours</a>
+      <a href="testimonials.php" class="<?= ($active ?? '') === 'testimonials' ? 'active' : '' ?>">Testimonials</a>
       <div class="section-label">Operations</div>
       <a href="requests.php" class="<?= ($active ?? '') === 'requests' ? 'active' : '' ?>">Client Requests</a>
       <a href="bookings.php" class="<?= ($active ?? '') === 'bookings' ? 'active' : '' ?>">Bookings</a>
@@ -34,10 +35,10 @@ $app = config('app_name', 'Pentagon Quest');
       <div class="section-label">System</div>
       <a href="settings.php" class="<?= ($active ?? '') === 'settings' ? 'active' : '' ?>">SMTP Settings</a>
       <a href="logs.php" class="<?= ($active ?? '') === 'logs' ? 'active' : '' ?>">Activity Logs</a>
-      <a href="logout.php">Sign out</a>
     </nav>
     <div class="sidebar-foot">
-      Signed in as<br><strong style="color:var(--text)"><?= e($admin['name'] ?? '') ?></strong>
+      <div>Signed in as<br><strong style="color:var(--text)"><?= e($admin['name'] ?? '') ?></strong></div>
+      <a href="logout.php" class="btn btn-secondary btn-sm" style="margin-top:10px;display:inline-block;width:100%;text-align:center">Sign out</a>
     </div>
   </aside>
   <main class="main">

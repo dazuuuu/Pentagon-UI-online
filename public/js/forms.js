@@ -2,27 +2,11 @@
  * Pentagon Quest – wire Elementor/contact forms to PHP API
  */
 (function () {
-  function pqBasePath() {
-    if (window.PQ_BASE_PATH != null) {
-      return String(window.PQ_BASE_PATH).replace(/\/$/, '');
-    }
-    const path = window.location.pathname || '';
-    const markers = ['/admin/', '/client/', '/api/', '/devs/'];
-    for (const marker of markers) {
-      const idx = path.indexOf(marker);
-      if (idx >= 0) return path.slice(0, idx);
-    }
-    const m = path.match(/^(\/Pentagon(?:%20| )Quest(?:%20| )UI)/i);
-    if (m) return decodeURIComponent(m[1]);
-    // From a page like /Pentagon Quest UI/about-us/… take the first folder
-    const parts = path.split('/').filter(Boolean);
-    if (parts.length && /pentagon/i.test(parts[0])) {
-      return '/' + decodeURIComponent(parts[0]);
-    }
-    return '/Pentagon Quest UI';
-  }
-
-  const API = pqBasePath() + '/api';
+  // Derived from this script's own resolved URL so it still finds /api
+  // correctly whether the site lives at a true domain root or is nested
+  // under a subfolder (e.g. local AMPPS serving the whole www/ folder).
+  const scriptSrc = document.currentScript && document.currentScript.src;
+  const API = scriptSrc ? scriptSrc.replace(/js\/forms\.js.*$/, 'api') : '/api';
 
   function getFields(form) {
     const data = {};

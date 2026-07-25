@@ -1,5 +1,33 @@
 <?php
 
+/**
+ * Minimal .env loader (no Composer dependency, matching the rest of this
+ * codebase). Only fills in variables that aren't already set, so real
+ * server/OS environment variables always take priority over the file.
+ */
+function load_dotenv(string $path): void
+{
+    if (!is_file($path)) {
+        return;
+    }
+    foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            continue;
+        }
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        if (strlen($value) > 1 && ($value[0] === '"' || $value[0] === "'") && $value[-1] === $value[0]) {
+            $value = substr($value, 1, -1);
+        }
+        if (getenv($key) === false) {
+            putenv("{$key}={$value}");
+            $_ENV[$key] = $value;
+        }
+    }
+}
+
 function config(?string $key = null, $default = null)
 {
     static $cfg = null;
@@ -25,20 +53,20 @@ function config(?string $key = null, $default = null)
 }
 
 /**
- * URL prefix for the site when it lives in a subfolder.
- * Default / configured root folder: "Pentagon Quest UI"
- * Example: http://localhost/Pentagon%20Quest%20UI/admin/login.php
+ * Detect the install URL prefix (e.g. "/Pentagon Quest UI" or "").
  */
-function base_path(): string
+function pq_base_prefix(): string
 {
     static $cached = null;
     if ($cached !== null) {
         return $cached;
     }
 
-    // Set by path-handler.php when the front controller is used
     if (defined('PQ_BASE_PATH')) {
-        $cached = (string)PQ_BASE_PATH;
+        $cached = rtrim((string)PQ_BASE_PATH, '/');
+        if ($cached === '/' || $cached === '.') {
+            $cached = '';
+        }
         return $cached;
     }
 
@@ -52,41 +80,47 @@ function base_path(): string
     }
 
     $script = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
-    // Ignore the front-controller filename when detecting the install folder
-    $script = preg_replace('#/(?:path-handler|index)\.php$#', '', $script) ?? $script;
-    if (preg_match('#^(.*?)/(?:admin|client|api|devs)(?:/|$)#', $script, $m)) {
+    $uri = rawurldecode((string)(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/'));
+
+    if (preg_match('#^(.*?)/(?:path-handler|router|index)\.php$#', $script, $m)) {
         $cached = $m[1];
         return $cached;
     }
-    if ($script !== '' && $script !== '/') {
-        $dir = rtrim(str_replace('\\', '/', dirname($script)), '/');
-        if ($dir !== '' && $dir !== '/' && $dir !== '.') {
-            $cached = $dir;
+
+    foreach ([$uri, $script] as $candidate) {
+        if (preg_match('#^(.*?)/(?:admin|client|api|devs|public)(?:/|$)#', $candidate, $m)) {
+            $cached = $m[1];
             return $cached;
         }
     }
 
-    // Fallback for local AMPPS/XAMPP folder name when auto-detect is unavailable
+    // Fallback for local AMPPS/XAMPP folder name
     $cached = '/Pentagon Quest UI';
     return $cached;
 }
 
 /**
- * Build a site-root-relative URL under the configured base path.
- * url('admin/login.php') => /Pentagon Quest UI/admin/login.php
+ * Site-root-relative path under the install folder.
+ * base_path('/admin/login.php') => /Pentagon Quest UI/admin/login.php
+ * base_path() or base_path('/') => /Pentagon Quest UI/
  */
+function base_path(string $path = ''): string
+{
+    $prefix = pq_base_prefix();
+    $path = ltrim($path, '/');
+    if ($path === '') {
+        return $prefix === '' ? '/' : $prefix . '/';
+    }
+    return ($prefix === '' ? '' : $prefix) . '/' . $path;
+}
+
+/** Alias used by older path-handler work. */
 function url(string $path = ''): string
 {
     if (preg_match('#^(https?:)?//#i', $path) || str_starts_with($path, 'mailto:') || str_starts_with($path, 'tel:')) {
         return $path;
     }
-
-    $base = base_path();
-    $path = ltrim($path, '/');
-    if ($path === '') {
-        return $base === '' ? '/' : $base . '/';
-    }
-    return ($base === '' ? '' : $base) . '/' . $path;
+    return base_path($path);
 }
 
 function app_url(string $path = ''): string
@@ -96,7 +130,7 @@ function app_url(string $path = ''): string
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $base = ($https ? 'https' : 'http') . '://' . $host . base_path();
+        $base = ($https ? 'https' : 'http') . '://' . $host . pq_base_prefix();
     }
     $path = ltrim($path, '/');
     return $path === '' ? $base : $base . '/' . $path;
@@ -109,9 +143,13 @@ function e(?string $value): string
 
 function redirect(string $to): never
 {
-    // Rewrite site-absolute paths so subdirectory installs keep working
+    // Prefix bare app paths; leave already-prefixed / full URLs alone
     if ($to !== '' && $to[0] === '/' && !str_starts_with($to, '//') && !preg_match('#^https?://#i', $to)) {
-        $to = url($to);
+        $prefix = pq_base_prefix();
+        $already = $prefix !== '' && (str_starts_with($to, $prefix . '/') || $to === $prefix);
+        if (!$already && preg_match('#^/(admin|client|api|devs|uploads)(/|$)#', $to)) {
+            $to = base_path($to);
+        }
     }
     header('Location: ' . $to);
     exit;

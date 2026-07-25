@@ -232,7 +232,10 @@ function pq_dispatch(): void
     $_SERVER['SCRIPT_NAME'] = ($basePath === '' ? '' : $basePath) . $rel;
     $_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_NAME'];
 
-    if (str_ends_with(strtolower($file), '.php')) {
+    $lower = strtolower($file);
+    // Mirror Apache AddType application/x-httpd-php .html — pages keep
+    // .html URLs but include shared PHP footer/hero settings mid-file.
+    if (str_ends_with($lower, '.php') || str_ends_with($lower, '.html') || str_ends_with($lower, '.htm')) {
         chdir(dirname($file));
         require $file;
         return;

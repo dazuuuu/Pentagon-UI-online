@@ -1,0 +1,85 @@
+/* Site-wide defensive fixes for this static export.
+   Elementor's page-transition preloader and popup templates are normally
+   shown/hidden entirely by JS. That JS never finishes cleanly here and
+   leaves the browser tab spinner running — hide/disable them hard. */
+e-page-transition,
+.e-page-transition,
+.elementor-location-popup {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Reliable fallback banner for per-page hero sections (see
+   js/page-hero-fallback.js). Independent of whatever Elementor's own
+   slideshow JS does or doesn't render inside the same element. */
+.pq-hero-bg-override {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.pq-hero-bg-override::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 24, 17, 0.45);
+}
+
+/* Footer background + readable light text (admin settings image/URL) */
+.elementor-element-fce0653,
+.elementor-location-footer .e-con.e-parent:first-child {
+    position: relative !important;
+    overflow: hidden;
+}
+.pq-footer-bg-override {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+.pq-footer-bg-override::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(8, 22, 16, 0.78) 0%,
+        rgba(8, 22, 16, 0.88) 55%,
+        rgba(8, 22, 16, 0.94) 100%
+    );
+}
+.elementor-element-fce0653 > .e-con-inner,
+.elementor-location-footer .e-con.e-parent:first-child > .e-con-inner {
+    position: relative;
+    z-index: 1;
+}
+.elementor-location-footer,
+.elementor-location-footer .elementor-heading-title,
+.elementor-location-footer .elementor-icon-list-text,
+.elementor-location-footer .elementor-text-editor,
+.elementor-location-footer .elementor-text-editor p,
+.elementor-location-footer a,
+.elementor-location-footer i,
+.elementor-location-footer svg {
+    color: #f5f7f4 !important;
+    fill: currentColor;
+}
+.elementor-location-footer a:hover {
+    color: #d4af37 !important;
+}
+.elementor-location-footer .elementor-social-icon {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+.elementor-location-footer .elementor-divider-separator {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
