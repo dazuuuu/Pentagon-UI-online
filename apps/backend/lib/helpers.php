@@ -36,6 +36,12 @@ function base_path(): string
         return $cached;
     }
 
+    // Set by path-handler.php when the front controller is used
+    if (defined('PQ_BASE_PATH')) {
+        $cached = (string)PQ_BASE_PATH;
+        return $cached;
+    }
+
     $configured = config('base_path', null);
     if (is_string($configured) && $configured !== '') {
         $cached = rtrim(str_replace('\\', '/', $configured), '/');
@@ -46,9 +52,18 @@ function base_path(): string
     }
 
     $script = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    // Ignore the front-controller filename when detecting the install folder
+    $script = preg_replace('#/(?:path-handler|index)\.php$#', '', $script) ?? $script;
     if (preg_match('#^(.*?)/(?:admin|client|api|devs)(?:/|$)#', $script, $m)) {
         $cached = $m[1];
         return $cached;
+    }
+    if ($script !== '' && $script !== '/') {
+        $dir = rtrim(str_replace('\\', '/', dirname($script)), '/');
+        if ($dir !== '' && $dir !== '/' && $dir !== '.') {
+            $cached = $dir;
+            return $cached;
+        }
     }
 
     // Fallback for local AMPPS/XAMPP folder name when auto-detect is unavailable
