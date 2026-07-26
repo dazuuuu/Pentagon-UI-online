@@ -1,0 +1,77 @@
+/* Site-wide utility navbar, injected at the top of every page except the
+   homepage (which already has its own custom hero nav). The scraped
+   theme's native mega-menu has empty link URLs on every item — this is a
+   plain, reliable replacement so every page has working navigation. */
+.pq-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 30px;
+    background: #14251b;
+    font-family: 'Poppins', Arial, sans-serif;
+    position: relative;
+    z-index: 100;
+}
+
+.pq-navbar__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.pq-navbar__brand img {
+    height: 32px;
+    width: auto;
+    display: block;
+}
+
+.pq-navbar__links {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    flex-wrap: wrap;
+}
+
+.pq-navbar__links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 3px;
+}
+
+.pq-navbar__links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: #D4AF37;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.25s ease;
+}
+
+.pq-navbar__links a:hover {
+    color: #D4AF37;
+}
+
+.pq-navbar__links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+@media (max-width: 700px) {
+    .pq-navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .pq-navbar__links {
+        gap: 16px;
+    }
+}

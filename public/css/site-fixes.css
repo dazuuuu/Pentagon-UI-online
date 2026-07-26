@@ -1,0 +1,29 @@
+/* Site-wide defensive fixes for this static export.
+   Elementor's page-transition preloader and popup templates are normally
+   shown/hidden entirely by JS (triggers, entrance animations). That JS
+   never runs in this static mirror, and neither has any CSS hiding it by
+   default, so on every page they can sit as plain, visible blocks —
+   forcibly hide them so nothing can ever sit on top of real content. */
+e-page-transition,
+.elementor-location-popup {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* Reliable fallback banner for per-page hero sections (see
+   js/page-hero-fallback.js). Independent of whatever Elementor's own
+   slideshow JS does or doesn't render inside the same element. */
+.pq-hero-bg-override {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.pq-hero-bg-override::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 24, 17, 0.45);
+}
