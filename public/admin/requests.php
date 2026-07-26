@@ -20,13 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         log_activity('admin', $admin['id'], 'request_update', "Updated request #{$id} to {$status}");
 
         if ($before && $status === 'accepted' && $before['status'] !== 'accepted') {
+            $brand = config('app_name', 'Pentagon Quest');
             $mailer = new Mailer();
-            $mailer->sendTemplate(
+            $ok = $mailer->sendTemplate(
                 $before['email'],
-                'Your request has been accepted · Pentagon Quest',
+                'Your request has been accepted · ' . $brand,
                 'Good news, ' . $before['name'] . '!',
-                '<p>Your inquiry' . ($before['subject'] ? ' — "' . e($before['subject']) . '"' : '') . ' has been accepted. Our team will be in touch shortly with next steps.</p>'
+                '<p>Your inquiry'
+                    . ($before['subject'] ? ' — “' . e($before['subject']) . '”' : '')
+                    . ' has been <strong>accepted</strong> by ' . e($brand) . '.</p>'
+                    . '<p>Our team will be in touch shortly with next steps. Thank you for choosing us.</p>',
+                'Browse packages',
+                app_url('/packages/')
             );
+            if ($ok) {
+                flash('success', 'Request accepted and confirmation email sent to ' . $before['email'] . '.');
+            } else {
+                flash('error', 'Request accepted, but email failed: ' . $mailer->getLastError());
+            }
+            redirect(base_path('/admin/requests.php?id=') . $id);
         }
 
         flash('success', 'Request updated.');

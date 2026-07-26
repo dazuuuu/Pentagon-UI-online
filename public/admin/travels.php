@@ -20,24 +20,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         if ($title === '') {
             flash('error', 'Title is required.');
         } elseif ($id > 0) {
+            $prev = $db->prepare('SELECT status FROM travels WHERE id = ?');
+            $prev->execute([$id]);
+            $prevStatus = (string)($prev->fetchColumn() ?: '');
+
             $db->prepare('UPDATE travels SET title=?, slug=?, location=?, country=?, summary=?, description=?, status=?, featured=?, updated_at=? WHERE id=?')
                 ->execute([$title, $slug, $location, $country, $summary, $description, $status, $featured, $now, $id]);
             log_activity('admin', $admin['id'], 'travel_update', "Updated travel #{$id}");
-            flash('success', 'Travel updated.');
-        } else {
-            $db->prepare('INSERT INTO travels (title, slug, location, country, summary, description, status, featured, created_at) VALUES (?,?,?,?,?,?,?,?,?)')
-                ->execute([$title, $slug, $location, $country, $summary, $description, $status, $featured, $now]);
-            log_activity('admin', $admin['id'], 'travel_create', "Created travel {$title}");
-            flash('success', 'Travel created.');
 
-            if ($status === 'published') {
-                notify_subscribers(
+            if ($status === 'published' && $prevStatus !== 'published') {
+                $alert = notify_subscribers(
                     'New destination: ' . $title . ' · Pentagon Quest',
                     'A new destination just went live',
                     '<p>' . e($title) . ($country ? ' — ' . e($country) : '') . '</p><p>' . nl2br(e($summary)) . '</p>',
                     'View destinations',
                     app_url('/destinations/')
                 );
+                flash('success', 'Travel updated. Subscriber alert: ' . (int)$alert['sent'] . ' sent'
+                    . ($alert['failed'] ? ', ' . (int)$alert['failed'] . ' failed' : '') . '.');
+            } else {
+                flash('success', 'Travel updated.');
+            }
+        } else {
+            $db->prepare('INSERT INTO travels (title, slug, location, country, summary, description, status, featured, created_at) VALUES (?,?,?,?,?,?,?,?,?)')
+                ->execute([$title, $slug, $location, $country, $summary, $description, $status, $featured, $now]);
+            log_activity('admin', $admin['id'], 'travel_create', "Created travel {$title}");
+
+            if ($status === 'published') {
+                $alert = notify_subscribers(
+                    'New destination: ' . $title . ' · Pentagon Quest',
+                    'A new destination just went live',
+                    '<p>' . e($title) . ($country ? ' — ' . e($country) : '') . '</p><p>' . nl2br(e($summary)) . '</p>',
+                    'View destinations',
+                    app_url('/destinations/')
+                );
+                flash('success', 'Travel created. Subscriber alert: ' . (int)$alert['sent'] . ' sent'
+                    . ($alert['failed'] ? ', ' . (int)$alert['failed'] . ' failed' : '') . '.');
+            } else {
+                flash('success', 'Travel created.');
             }
         }
         redirect(base_path('/admin/travels.php'));

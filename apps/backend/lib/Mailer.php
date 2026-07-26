@@ -2,7 +2,7 @@
 
 /**
  * Lightweight SMTP mailer (no Composer dependency).
- * Supports AUTH LOGIN over TLS/SSL/plain.
+ * Supports AUTH LOGIN / AUTH PLAIN over TLS, SSL, or plain.
  */
 class Mailer
 {
@@ -21,33 +21,69 @@ class Mailer
 
     public function isConfigured(): bool
     {
-        return !empty($this->smtp['host']) && !empty($this->smtp['from_email']);
+        return trim((string)($this->smtp['host'] ?? '')) !== ''
+            && trim((string)($this->smtp['from_email'] ?? '')) !== '';
     }
 
     private function loadSettings(): array
     {
         $defaults = config('smtp') ?? [];
+        $defaults = [
+            'host' => (string)($defaults['host'] ?? ''),
+            'port' => (int)($defaults['port'] ?? 587),
+            'encryption' => (string)($defaults['encryption'] ?? 'tls'),
+            'username' => (string)($defaults['username'] ?? ''),
+            'password' => (string)($defaults['password'] ?? ''),
+            'from_email' => (string)($defaults['from_email'] ?? ''),
+            'from_name' => (string)($defaults['from_name'] ?? 'Pentagon Quest'),
+        ];
+
         try {
-            $rows = Database::get()->query("SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE 'smtp_%'")->fetchAll();
+            $rows = Database::get()
+                ->query("SELECT setting_key, setting_value FROM settings WHERE setting_key LIKE 'smtp_%'")
+                ->fetchAll();
             foreach ($rows as $row) {
-                $key = substr($row['setting_key'], 5);
+                $key = substr($row['setting_key'], 5); // smtp_host → host
+                $value = trim((string)($row['setting_value'] ?? ''));
                 if ($key === 'port') {
-                    $defaults['port'] = (int)$row['setting_value'];
-                } else {
-                    $defaults[$key] = $row['setting_value'];
+                    if ($value !== '') {
+                        $defaults['port'] = (int)$value;
+                    }
+                    continue;
+                }
+                // Don't let blank admin fields wipe a valid env/config fallback
+                if ($value !== '' || !isset($defaults[$key]) || $defaults[$key] === '') {
+                    $defaults[$key] = $value;
                 }
             }
         } catch (Throwable $e) {
             // Settings table may not exist yet
         }
+
+        $defaults['host'] = trim((string)$defaults['host']);
+        $defaults['username'] = trim((string)$defaults['username']);
+        $defaults['password'] = (string)$defaults['password']; // keep spaces inside app passwords? trim ends only
+        $defaults['password'] = trim($defaults['password']);
+        $defaults['from_email'] = trim((string)$defaults['from_email']);
+        $defaults['from_name'] = trim((string)$defaults['from_name']) ?: 'Pentagon Quest';
+        $defaults['encryption'] = strtolower(trim((string)$defaults['encryption']) ?: 'tls');
+        $defaults['port'] = (int)($defaults['port'] ?: 587);
+
         return $defaults;
     }
 
     public function send(string $to, string $subject, string $htmlBody, ?string $textBody = null, array $headers = []): bool
     {
         $this->lastError = '';
-        $fromEmail = $this->smtp['from_email'] ?? '';
-        $fromName = $this->smtp['from_name'] ?? 'Pentagon Quest';
+        $to = trim($to);
+        $fromEmail = trim((string)($this->smtp['from_email'] ?? ''));
+        $fromName = (string)($this->smtp['from_name'] ?? 'Pentagon Quest');
+
+        if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            $this->lastError = 'Invalid recipient email address.';
+            $this->logEmail($to, $subject, $htmlBody, 'failed', $this->lastError);
+            return false;
+        }
 
         if (!$this->isConfigured()) {
             $this->lastError = 'SMTP is not configured. Set host and from address in Admin → Settings.';
@@ -62,6 +98,7 @@ class Mailer
             'Date: ' . date('r'),
             'From: ' . $this->encodeAddress($fromEmail, $fromName),
             'To: ' . $this->encodeAddress($to),
+            'Reply-To: ' . $this->encodeAddress($fromEmail, $fromName),
             'Subject: ' . $this->encodeHeader($subject),
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
@@ -82,6 +119,8 @@ class Mailer
             . "--{$boundary}--\r\n";
 
         $message = implode("\r\n", $msgHeaders) . "\r\n\r\n" . $body;
+        // RFC 5321: dot-stuff any line that begins with "."
+        $message = preg_replace('/^\./m', '..', $message) ?? $message;
 
         $ok = $this->smtpSend($fromEmail, $to, $message);
         $this->logEmail($to, $subject, $htmlBody, $ok ? 'sent' : 'failed', $ok ? null : $this->lastError);
@@ -104,6 +143,16 @@ class Mailer
         return $this->send($to, $subject, $html);
     }
 
+    private function ehloName(): string
+    {
+        $from = (string)($this->smtp['from_email'] ?? '');
+        if (str_contains($from, '@')) {
+            return substr(strrchr($from, '@'), 1) ?: 'localhost';
+        }
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        return preg_replace('/:\d+$/', '', $host) ?: 'localhost';
+    }
+
     private function smtpSend(string $from, string $to, string $data): bool
     {
         $host = $this->smtp['host'];
@@ -111,33 +160,83 @@ class Mailer
         $enc = strtolower((string)($this->smtp['encryption'] ?? 'tls'));
         $user = (string)($this->smtp['username'] ?? '');
         $pass = (string)($this->smtp['password'] ?? '');
+        $ehlo = $this->ehloName();
+
+        // Auto-correct common port/encryption mismatches
+        if ($port === 465 && $enc === 'tls') {
+            $enc = 'ssl';
+        }
+        if ($port === 587 && $enc === 'ssl') {
+            $enc = 'tls';
+        }
 
         $remote = ($enc === 'ssl' ? 'ssl://' : '') . $host;
+        $context = stream_context_create([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+                'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT
+                    | (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT') ? STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT : 0),
+            ],
+        ]);
+
         $errno = 0;
         $errstr = '';
-        $fp = @stream_socket_client("{$remote}:{$port}", $errno, $errstr, 30, STREAM_CLIENT_CONNECT);
+        $fp = @stream_socket_client(
+            "{$remote}:{$port}",
+            $errno,
+            $errstr,
+            30,
+            STREAM_CLIENT_CONNECT,
+            $context
+        );
         if (!$fp) {
-            $this->lastError = "Connection failed: {$errstr} ({$errno})";
+            $this->lastError = "Connection failed to {$host}:{$port} — {$errstr} ({$errno})";
             return false;
         }
         stream_set_timeout($fp, 30);
 
         try {
             $this->expect($fp, [220]);
-            $this->command($fp, 'EHLO pentagonquest.local', [250]);
+            $this->command($fp, 'EHLO ' . $ehlo, [250]);
 
             if ($enc === 'tls') {
                 $this->command($fp, 'STARTTLS', [220]);
-                if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                    throw new RuntimeException('STARTTLS negotiation failed');
+                $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT
+                    | (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT') ? STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT : 0);
+                if (!@stream_socket_enable_crypto($fp, true, $crypto)) {
+                    // Fallback for older/odd OpenSSL builds
+                    if (!@stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_ANY_CLIENT)) {
+                        throw new RuntimeException('STARTTLS negotiation failed');
+                    }
                 }
-                $this->command($fp, 'EHLO pentagonquest.local', [250]);
+                $this->command($fp, 'EHLO ' . $ehlo, [250]);
             }
 
             if ($user !== '') {
-                $this->command($fp, 'AUTH LOGIN', [334]);
-                $this->command($fp, base64_encode($user), [334]);
-                $this->command($fp, base64_encode($pass), [235]);
+                $authed = false;
+                $authError = '';
+                try {
+                    $this->command($fp, 'AUTH LOGIN', [334]);
+                    $this->command($fp, base64_encode($user), [334]);
+                    $this->command($fp, base64_encode($pass), [235]);
+                    $authed = true;
+                } catch (Throwable $e) {
+                    $authError = $e->getMessage();
+                }
+                if (!$authed) {
+                    // AUTH PLAIN fallback (many providers accept both)
+                    try {
+                        $this->command($fp, 'AUTH PLAIN ' . base64_encode("\0{$user}\0{$pass}"), [235]);
+                        $authed = true;
+                    } catch (Throwable $e) {
+                        throw new RuntimeException(
+                            'SMTP authentication failed. Check username/password (use an app password if required). '
+                            . $authError . ' / ' . $e->getMessage()
+                        );
+                    }
+                }
             }
 
             $this->command($fp, 'MAIL FROM:<' . $from . '>', [250]);
@@ -145,12 +244,18 @@ class Mailer
             $this->command($fp, 'DATA', [354]);
             fwrite($fp, $data . "\r\n.\r\n");
             $this->expect($fp, [250]);
-            $this->command($fp, 'QUIT', [221]);
+            try {
+                $this->command($fp, 'QUIT', [221]);
+            } catch (Throwable $e) {
+                // Some servers drop the socket after a successful send
+            }
             fclose($fp);
             return true;
         } catch (Throwable $e) {
             $this->lastError = $e->getMessage();
-            fclose($fp);
+            if (is_resource($fp)) {
+                @fclose($fp);
+            }
             return false;
         }
     }
@@ -169,6 +274,14 @@ class Mailer
             if (isset($line[3]) && $line[3] === ' ') {
                 break;
             }
+            // Timeout / empty read protection
+            $meta = stream_get_meta_data($fp);
+            if (!empty($meta['timed_out'])) {
+                throw new RuntimeException('SMTP timeout while waiting for response');
+            }
+        }
+        if ($response === '') {
+            throw new RuntimeException('SMTP server closed the connection or returned an empty response');
         }
         $code = (int)substr($response, 0, 3);
         if (!in_array($code, $codes, true)) {
@@ -209,7 +322,7 @@ class Mailer
                 date('Y-m-d H:i:s'),
             ]);
         } catch (Throwable $e) {
-            // ignore
+            // ignore logging failures
         }
     }
 }
