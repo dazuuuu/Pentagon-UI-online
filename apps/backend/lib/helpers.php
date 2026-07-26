@@ -210,26 +210,51 @@ function request_json(): array
     return is_array($data) ? $data : [];
 }
 
-function notify_subscribers(string $subject, string $title, string $bodyHtml, ?string $ctaLabel = null, ?string $ctaUrl = null): void
+/**
+ * Email every active newsletter subscriber.
+ * Returns ['sent' => int, 'failed' => int, 'errors' => string[]].
+ */
+function notify_subscribers(string $subject, string $title, string $bodyHtml, ?string $ctaLabel = null, ?string $ctaUrl = null): array
 {
+    $result = ['sent' => 0, 'failed' => 0, 'errors' => []];
     try {
         $emails = Database::get()
             ->query("SELECT email FROM newsletter_subscribers WHERE is_active = 1")
             ->fetchAll(PDO::FETCH_COLUMN);
     } catch (Throwable $e) {
-        return;
+        $result['errors'][] = $e->getMessage();
+        return $result;
     }
     if (!$emails) {
-        return;
+        return $result;
     }
+
     $mailer = new Mailer();
+    if (!$mailer->isConfigured()) {
+        $result['errors'][] = $mailer->getLastError() ?: 'SMTP is not configured.';
+        $result['failed'] = count($emails);
+        return $result;
+    }
+
     foreach ($emails as $email) {
+        $email = trim((string)$email);
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $result['failed']++;
+            continue;
+        }
         try {
-            $mailer->sendTemplate($email, $subject, $title, $bodyHtml, $ctaLabel, $ctaUrl);
+            if ($mailer->sendTemplate($email, $subject, $title, $bodyHtml, $ctaLabel, $ctaUrl)) {
+                $result['sent']++;
+            } else {
+                $result['failed']++;
+                $result['errors'][] = $email . ': ' . $mailer->getLastError();
+            }
         } catch (Throwable $e) {
-            // One bad address shouldn't stop the rest of the broadcast
+            $result['failed']++;
+            $result['errors'][] = $email . ': ' . $e->getMessage();
         }
     }
+    return $result;
 }
 
 function slugify(string $text): string

@@ -26,24 +26,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         if ($title === '') {
             flash('error', 'Title is required.');
         } elseif ($id > 0) {
+            $prev = $db->prepare('SELECT status FROM tours WHERE id = ?');
+            $prev->execute([$id]);
+            $prevStatus = (string)($prev->fetchColumn() ?: '');
+
             $db->prepare('UPDATE tours SET travel_id=?, title=?, slug=?, description=?, duration_days=?, duration_label=?, price=?, currency=?, location=?, inclusions=?, exclusions=?, itinerary=?, status=?, featured=?, updated_at=? WHERE id=?')
                 ->execute([$travelId, $title, $slug, $description, $durationDays, $durationLabel, $price, $currency, $location, $inclusions, $exclusions, $itinerary, $status, $featured, $now, $id]);
             log_activity('admin', $admin['id'], 'tour_update', "Updated tour #{$id}");
-            flash('success', 'Tour updated.');
-        } else {
-            $db->prepare('INSERT INTO tours (travel_id, title, slug, description, duration_days, duration_label, price, currency, location, inclusions, exclusions, itinerary, status, featured, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-                ->execute([$travelId, $title, $slug, $description, $durationDays, $durationLabel, $price, $currency, $location, $inclusions, $exclusions, $itinerary, $status, $featured, $now]);
-            log_activity('admin', $admin['id'], 'tour_create', "Created tour {$title}");
-            flash('success', 'Tour created.');
 
-            if ($status === 'published') {
-                notify_subscribers(
+            $alert = null;
+            if ($status === 'published' && $prevStatus !== 'published') {
+                $alert = notify_subscribers(
                     'New tour: ' . $title . ' · Pentagon Quest',
                     'A new tour just went live',
                     '<p>' . e($title) . ($location ? ' — ' . e($location) : '') . '</p><p>' . nl2br(e(mb_strimwidth($description, 0, 300, '…'))) . '</p>',
                     'View tours',
                     app_url('/packages/')
                 );
+            }
+            if ($alert) {
+                flash('success', 'Tour updated. Subscriber alert: ' . (int)$alert['sent'] . ' sent'
+                    . ($alert['failed'] ? ', ' . (int)$alert['failed'] . ' failed' : '') . '.');
+            } else {
+                flash('success', 'Tour updated.');
+            }
+        } else {
+            $db->prepare('INSERT INTO tours (travel_id, title, slug, description, duration_days, duration_label, price, currency, location, inclusions, exclusions, itinerary, status, featured, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+                ->execute([$travelId, $title, $slug, $description, $durationDays, $durationLabel, $price, $currency, $location, $inclusions, $exclusions, $itinerary, $status, $featured, $now]);
+            log_activity('admin', $admin['id'], 'tour_create', "Created tour {$title}");
+
+            if ($status === 'published') {
+                $alert = notify_subscribers(
+                    'New tour: ' . $title . ' · Pentagon Quest',
+                    'A new tour just went live',
+                    '<p>' . e($title) . ($location ? ' — ' . e($location) : '') . '</p><p>' . nl2br(e(mb_strimwidth($description, 0, 300, '…'))) . '</p>',
+                    'View tours',
+                    app_url('/packages/')
+                );
+                flash('success', 'Tour created. Subscriber alert: ' . (int)$alert['sent'] . ' sent'
+                    . ($alert['failed'] ? ', ' . (int)$alert['failed'] . ' failed' : '') . '.');
+            } else {
+                flash('success', 'Tour created.');
             }
         }
         redirect(base_path('/admin/tours.php'));
