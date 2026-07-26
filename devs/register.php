@@ -6,7 +6,7 @@ try {
     $adminCount = Auth::adminCount();
 } catch (Throwable $e) {
     flash('error', 'Database not ready. Run migrations first.');
-    redirect('/admin/migrate.php');
+    redirect(base_path('/admin/migrate.php'));
 }
 
 $open = config('allow_open_admin_register', true) && $adminCount === 0;
@@ -14,7 +14,7 @@ $current = Auth::admin();
 
 if (!$open && !$current) {
     flash('error', 'Admin registration is closed. Sign in as an existing admin to add more.');
-    redirect('/admin/login.php');
+    redirect(base_path('/admin/login.php'));
 }
 
 $error = '';
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Auth::attemptAdmin($email, $password);
                 }
                 flash('success', 'Admin account created successfully.');
-                redirect('/admin/index.php');
+                redirect(base_path('/admin/index.php'));
             } catch (PDOException $e) {
                 $error = str_contains($e->getMessage(), 'UNIQUE')
                     ? 'An admin with that email already exists.'
@@ -68,12 +68,12 @@ $app = config('app_name', 'Pentagon Quest');
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
 </head>
 <body>
 <div class="auth-wrap">
   <div class="auth-card">
-    <div class="brand"><div class="brand-mark"></div><span><?= e($app) ?></span></div>
+    <div class="brand"><img class="brand-mark" src="../assets/logo.png" alt=""><span><?= e($app) ?></span></div>
     <h1><?= $open ? 'Create first admin' : 'Register admin' ?></h1>
     <p class="sub"><?= $open ? 'No admins exist yet. Create the first account to unlock the dashboard.' : 'Add another administrator account.' ?></p>
     <?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
@@ -97,7 +97,7 @@ $app = config('app_name', 'Pentagon Quest');
       </div>
       <button class="btn btn-block" type="submit">Create admin</button>
     </form>
-    <p style="margin-top:16px;font-size:.9rem"><a href="/admin/login.php">Back to login</a></p>
+    <p style="margin-top:16px;font-size:.9rem"><a href="../admin/login.php">Back to login</a></p>
   </div>
 </div>
 </body>

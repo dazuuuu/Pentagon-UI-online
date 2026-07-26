@@ -14,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
             'hero_cta_url' => trim($_POST['hero_cta_url'] ?? ''),
             'hero_secondary_label' => trim($_POST['hero_secondary_label'] ?? ''),
             'hero_secondary_url' => trim($_POST['hero_secondary_url'] ?? ''),
+            'hero_video_url' => trim($_POST['hero_video_url'] ?? ''),
+            'footer_image_url' => trim($_POST['footer_image_url'] ?? ''),
+            'page_hero_image_url' => trim($_POST['page_hero_image_url'] ?? ''),
             'smtp_host' => trim($_POST['smtp_host'] ?? ''),
             'smtp_port' => trim($_POST['smtp_port'] ?? '587'),
             'smtp_encryption' => trim($_POST['smtp_encryption'] ?? 'tls'),
@@ -28,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         }
         log_activity('admin', $admin['id'], 'settings_update', 'Updated site and SMTP settings');
         flash('success', 'Settings saved.');
-        redirect('/admin/settings.php');
+        redirect(base_path('/admin/settings.php'));
     }
     if ($action === 'test') {
         $to = trim($_POST['test_email'] ?? $admin['email']);
@@ -44,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         } else {
             flash('error', 'Test failed: ' . $mailer->getLastError());
         }
-        redirect('/admin/settings.php');
+        redirect(base_path('/admin/settings.php'));
     }
 }
 
@@ -57,6 +60,9 @@ $site = [
     'hero_cta_url' => Settings::get('hero_cta_url', '/packages/'),
     'hero_secondary_label' => Settings::get('hero_secondary_label', 'View destinations'),
     'hero_secondary_url' => Settings::get('hero_secondary_url', '/destinations/'),
+    'hero_video_url' => Settings::get('hero_video_url', ''),
+    'footer_image_url' => Settings::get('footer_image_url', ''),
+    'page_hero_image_url' => Settings::get('page_hero_image_url', ''),
 ];
 
 $smtp = [
@@ -90,8 +96,13 @@ require __DIR__ . '/includes/header.php';
       <input type="text" name="site_name" value="<?= e($site['name']) ?>" placeholder="Pentagon Quest">
     </div>
     <div>
-      <label>Site logo URL</label>
-      <input type="url" name="site_logo" value="<?= e($site['logo']) ?>" placeholder="/uploads/logo.png">
+      <label>Site logo</label>
+      <input type="text" name="site_logo" id="site_logo" value="<?= e($site['logo']) ?>" placeholder="/uploads/logo.png">
+      <div class="pq-upload-row">
+        <input type="file" accept="image/*" data-upload-target="site_logo" data-upload-kind="image">
+        <span class="pq-upload-status"></span>
+      </div>
+      <div class="help">Paste a URL above, or upload an image file directly.</div>
     </div>
     <div>
       <label>Hero headline</label>
@@ -107,7 +118,7 @@ require __DIR__ . '/includes/header.php';
     </div>
     <div>
       <label>Primary CTA URL</label>
-      <input type="url" name="hero_cta_url" value="<?= e($site['hero_cta_url']) ?>">
+      <input type="text" name="hero_cta_url" value="<?= e($site['hero_cta_url']) ?>">
     </div>
     <div>
       <label>Secondary CTA label</label>
@@ -115,7 +126,34 @@ require __DIR__ . '/includes/header.php';
     </div>
     <div>
       <label>Secondary CTA URL</label>
-      <input type="url" name="hero_secondary_url" value="<?= e($site['hero_secondary_url']) ?>">
+      <input type="text" name="hero_secondary_url" value="<?= e($site['hero_secondary_url']) ?>">
+    </div>
+    <div>
+      <label>Hero video</label>
+      <input type="text" name="hero_video_url" id="hero_video_url" value="<?= e($site['hero_video_url']) ?>" placeholder="https://youtu.be/...">
+      <div class="pq-upload-row">
+        <input type="file" accept="video/*" data-upload-target="hero_video_url" data-upload-kind="video">
+        <span class="pq-upload-status"></span>
+      </div>
+      <div class="help">Paste a YouTube link, or upload a video file directly (max 100MB).</div>
+    </div>
+    <div>
+      <label>Footer background image</label>
+      <input type="text" name="footer_image_url" id="footer_image_url" value="<?= e($site['footer_image_url']) ?>" placeholder="/uploads/footer.jpg">
+      <div class="pq-upload-row">
+        <input type="file" accept="image/*" data-upload-target="footer_image_url" data-upload-kind="image">
+        <span class="pq-upload-status"></span>
+      </div>
+      <div class="help">Paste a URL above, or upload an image file directly.</div>
+    </div>
+    <div>
+      <label>Inner page hero background</label>
+      <input type="text" name="page_hero_image_url" id="page_hero_image_url" value="<?= e($site['page_hero_image_url']) ?>" placeholder="/uploads/page-hero.jpg">
+      <div class="pq-upload-row">
+        <input type="file" accept="image/*" data-upload-target="page_hero_image_url" data-upload-kind="image">
+        <span class="pq-upload-status"></span>
+      </div>
+      <div class="help">Used as a reliable fallback banner behind the title on destination/package pages when a page's own photo isn't available. Leave blank to use each page's own images.</div>
     </div>
     <div class="full"><hr style="border-color:var(--line);opacity:.6"></div>
     <div>

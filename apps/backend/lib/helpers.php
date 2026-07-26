@@ -1,5 +1,33 @@
 <?php
 
+/**
+ * Minimal .env loader (no Composer dependency, matching the rest of this
+ * codebase). Only fills in variables that aren't already set, so real
+ * server/OS environment variables always take priority over the file.
+ */
+function load_dotenv(string $path): void
+{
+    if (!is_file($path)) {
+        return;
+    }
+    foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            continue;
+        }
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        if (strlen($value) > 1 && ($value[0] === '"' || $value[0] === "'") && $value[-1] === $value[0]) {
+            $value = substr($value, 1, -1);
+        }
+        if (getenv($key) === false) {
+            putenv("{$key}={$value}");
+            $_ENV[$key] = $value;
+        }
+    }
+}
+
 function config(?string $key = null, $default = null)
 {
     static $cfg = null;
@@ -35,6 +63,31 @@ function app_url(string $path = ''): string
     }
     $path = '/' . ltrim($path, '/');
     return $base . ($path === '/' ? '' : $path);
+}
+
+/**
+ * Site-root-relative path, correct whether the app is deployed at a true
+ * domain root (cPanel, or the local vhost) or nested under a subfolder
+ * (e.g. local AMPPS serving the whole www/ folder). Computed once per
+ * request by finding where /admin/, /client/, or /api/ sits in the
+ * current script path and treating everything before it as the prefix.
+ */
+function base_path(string $path = ''): string
+{
+    static $prefix = null;
+    if ($prefix === null) {
+        $script = $_SERVER['SCRIPT_NAME'] ?? '';
+        $prefix = '';
+        foreach (['/admin/', '/client/', '/api/'] as $marker) {
+            $pos = strpos($script, $marker);
+            if ($pos !== false) {
+                $prefix = substr($script, 0, $pos);
+                break;
+            }
+        }
+    }
+    $path = '/' . ltrim($path, '/');
+    return $prefix . $path;
 }
 
 function e(?string $value): string

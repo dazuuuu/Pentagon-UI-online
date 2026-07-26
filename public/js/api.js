@@ -1,5 +1,7 @@
-// Base configuration for API
-const API_BASE_URL = '/api';
+// Base configuration for API — derived from this module's own resolved URL
+// (import.meta.url) so it still finds /api correctly whether the site
+// lives at a true domain root or is nested under a subfolder.
+const API_BASE_URL = new URL('../api', import.meta.url).pathname;
 
 export const ApiService = {
     async get(endpoint) {

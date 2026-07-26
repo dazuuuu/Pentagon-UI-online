@@ -41,12 +41,12 @@ $app = config('app_name', 'Pentagon Quest');
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <link rel="stylesheet" href="assets/admin.css">
 </head>
 <body>
 <?php if ($admin): $pageTitle = 'Migrations'; $active = 'migrate'; require __DIR__ . '/includes/header.php'; else: ?>
 <div class="auth-wrap"><div class="auth-card" style="width:min(720px,100%)">
-  <div class="brand"><div class="brand-mark"></div><span><?= e($app) ?></span></div>
+  <div class="brand"><img class="brand-mark" src="assets/logo.png" alt=""><span><?= e($app) ?></span></div>
   <h1>Database migrations</h1>
   <p class="sub">Run this once after deployment to create tables. Then register your first admin.</p>
 <?php endif; ?>
@@ -126,7 +126,7 @@ $app = config('app_name', 'Pentagon Quest');
 </div>
 
 <p class="muted" style="margin-top:8px">
-  Next: run <code>devs/register.php</code> locally to create the first admin · <a href="/admin/login.php">Login</a> · Driver: <strong><?= e(Database::driver()) ?></strong>
+  Next: run <code>devs/register.php</code> locally to create the first admin · <a href="login.php">Login</a> · Driver: <strong><?= e(Database::driver()) ?></strong>
 </p>
 
 <?php if ($admin): require __DIR__ . '/includes/footer.php'; else: ?>

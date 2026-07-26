@@ -2,7 +2,11 @@
  * Pentagon Quest – wire Elementor/contact forms to PHP API
  */
 (function () {
-  const API = '/api';
+  // Derived from this script's own resolved URL so it still finds /api
+  // correctly whether the site lives at a true domain root or is nested
+  // under a subfolder (e.g. local AMPPS serving the whole www/ folder).
+  const scriptSrc = document.currentScript && document.currentScript.src;
+  const API = scriptSrc ? scriptSrc.replace(/js\/forms\.js.*$/, 'api') : '/api';
 
   function getFields(form) {
     const data = {};

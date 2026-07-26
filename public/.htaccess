@@ -1,0 +1,3 @@
+# Let .html pages use PHP includes (shared header/footer components) while
+# keeping their .html URLs unchanged — nothing about existing links breaks.
+AddType application/x-httpd-php .html .htm

@@ -2,7 +2,7 @@
 require_once dirname(__DIR__, 2) . '/apps/backend/bootstrap.php';
 
 if (Auth::client()) {
-    redirect('/client/index.php');
+    redirect(base_path('/client/index.php'));
 }
 
 $error = '';
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 )->execute([$name, $email, $phone, password_hash($password, PASSWORD_DEFAULT), date('Y-m-d H:i:s')]);
                 Auth::attemptClient($email, $password);
                 flash('success', 'Account created. Your tours will appear here once booked.');
-                redirect('/client/index.php');
+                redirect(base_path('/client/index.php'));
             } catch (PDOException $e) {
                 $error = str_contains($e->getMessage(), 'UNIQUE')
                     ? 'An account with that email already exists.'
@@ -54,6 +54,6 @@ require __DIR__ . '/includes/header.php';
     <div><label>Confirm password</label><input type="password" name="password_confirm" required minlength="8"></div>
     <button class="btn btn-block" type="submit">Register</button>
   </form>
-  <p style="margin-top:14px"><a href="/client/login.php">Already have an account? Sign in</a></p>
+  <p style="margin-top:14px"><a href="login.php">Already have an account? Sign in</a></p>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

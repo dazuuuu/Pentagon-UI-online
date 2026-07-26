@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
                 );
             }
             flash('success', "Booking created with tracking code {$code}.");
-            redirect('/admin/bookings.php?id=' . $bookingId);
+            redirect(base_path('/admin/bookings.php?id=') . $bookingId);
         }
     }
 
@@ -93,14 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
         }
         log_activity('admin', $admin['id'], 'booking_update', "Updated booking #{$id}");
         flash('success', 'Booking updated.');
-        redirect('/admin/bookings.php?id=' . $id);
+        redirect(base_path('/admin/bookings.php?id=') . $id);
     }
 
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         $db->prepare('DELETE FROM bookings WHERE id = ?')->execute([$id]);
         flash('success', 'Booking deleted.');
-        redirect('/admin/bookings.php');
+        redirect(base_path('/admin/bookings.php'));
     }
 }
 
@@ -136,7 +136,7 @@ require __DIR__ . '/includes/header.php';
 <div class="panel">
   <div class="panel-head">
     <h2><?= e($view['tracking_code']) ?> · <?= e($view['title']) ?></h2>
-    <a href="/admin/bookings.php">Back</a>
+    <a href="bookings.php">Back</a>
   </div>
   <p class="muted">Client: <strong style="color:var(--text)"><?= e($view['client_name']) ?></strong> (<?= e($view['client_email']) ?>)</p>
   <form method="post" class="form-grid" style="margin-top:14px">
@@ -209,7 +209,7 @@ require __DIR__ . '/includes/header.php';
           <option value="<?= (int)$c['id'] ?>"><?= e($c['name']) ?> (<?= e($c['email']) ?>)</option>
         <?php endforeach; ?>
       </select>
-      <?php if (!$clients): ?><div class="help">No clients yet — <a href="/admin/clients.php">create one</a>.</div><?php endif; ?>
+      <?php if (!$clients): ?><div class="help">No clients yet — <a href="clients.php">create one</a>.</div><?php endif; ?>
     </div>
     <div>
       <label>Tour package</label>
@@ -274,7 +274,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= status_badge($r['status']) ?></td>
           <td><?= (int)$r['progress_percent'] ?>%</td>
           <td class="actions">
-            <a class="btn btn-secondary btn-sm" href="/admin/bookings.php?id=<?= (int)$r['id'] ?>">Manage</a>
+            <a class="btn btn-secondary btn-sm" href="bookings.php?id=<?= (int)$r['id'] ?>">Manage</a>
             <form method="post" onsubmit="return confirm('Delete booking?')">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="delete">

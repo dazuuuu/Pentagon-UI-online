@@ -46,14 +46,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf()) {
                 );
             }
         }
-        redirect('/admin/tours.php');
+        redirect(base_path('/admin/tours.php'));
     }
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         $db->prepare('DELETE FROM tours WHERE id = ?')->execute([$id]);
         log_activity('admin', $admin['id'], 'tour_delete', "Deleted tour #{$id}");
         flash('success', 'Tour deleted.');
-        redirect('/admin/tours.php');
+        redirect(base_path('/admin/tours.php'));
     }
 }
 
@@ -78,7 +78,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2><?= $edit ? 'Edit tour' : 'Add tour' ?></h2><?php if ($edit): ?><a href="/admin/tours.php">Cancel</a><?php endif; ?></div>
+  <div class="panel-head"><h2><?= $edit ? 'Edit tour' : 'Add tour' ?></h2><?php if ($edit): ?><a href="tours.php">Cancel</a><?php endif; ?></div>
   <form method="post" class="form-grid">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="save">
@@ -165,7 +165,7 @@ require __DIR__ . '/includes/header.php';
           <td><?= e($r['duration_label'] ?: (($r['duration_days'] ? $r['duration_days'] . ' days' : '—'))) ?></td>
           <td><?= status_badge($r['status']) ?></td>
           <td class="actions">
-            <a class="btn btn-secondary btn-sm" href="/admin/tours.php?edit=<?= (int)$r['id'] ?>">Edit</a>
+            <a class="btn btn-secondary btn-sm" href="tours.php?edit=<?= (int)$r['id'] ?>">Edit</a>
             <form method="post" onsubmit="return confirm('Delete this tour?')">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="delete">

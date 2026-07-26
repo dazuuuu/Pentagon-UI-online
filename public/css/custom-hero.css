@@ -1,12 +1,43 @@
-/* Elementor page-transition preloader and popup templates are normally
-   shown/hidden entirely by JS (triggers, entrance animations). That JS
-   never runs in this static mirror, and neither has any CSS hiding it by
-   default here, so they can sit on the page as full, un-hidden blocks —
-   forcibly hide them so nothing can sit on top of real content. */
-e-page-transition,
-.elementor-location-popup {
-    display: none !important;
-    pointer-events: none !important;
+/* Footer background — independent layer injected by JS (see index.html),
+   bypassing Elementor's JS-generated "motion effects" wrapper entirely.
+   The ::after scrim guarantees the footer's white text stays readable
+   regardless of how bright or busy whatever image is used there. */
+.elementor-element-fce0653 {
+    position: relative;
+}
+.pq-footer-bg-override {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.pq-footer-bg-override::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 24, 17, 0.72);
+}
+
+/* "Our Promise" video/stats section — was white background with dark text.
+   Turned into a proper dark band (matching the video banner beside it) so
+   the text can be white and bold and still be readable. */
+.elementor-element-4583baa9 {
+    background-color: #0A4322 !important;
+}
+.elementor-element-4583baa9 h1,
+.elementor-element-4583baa9 h2,
+.elementor-element-4583baa9 h3,
+.elementor-element-4583baa9 h4,
+.elementor-element-4583baa9 p,
+.elementor-element-4583baa9 .elementor-heading-title,
+.elementor-element-4583baa9 .elementor-counter-title,
+.elementor-element-4583baa9 .elementor-counter-number,
+.elementor-element-4583baa9 .elementor-counter-number-prefix,
+.elementor-element-4583baa9 .elementor-counter-number-suffix {
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 /* Custom Hero Section */

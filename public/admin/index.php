@@ -25,8 +25,8 @@ require __DIR__ . '/includes/header.php';
     <p>Overview of catalog, requests, and client bookings.</p>
   </div>
   <div class="actions">
-    <a class="btn btn-secondary btn-sm" href="/admin/travels.php">Add travel</a>
-    <a class="btn btn-sm" href="/admin/emails.php">Send email</a>
+    <a class="btn btn-secondary btn-sm" href="travels.php">Add travel</a>
+    <a class="btn btn-sm" href="emails.php">Send email</a>
   </div>
 </div>
 
@@ -38,7 +38,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2>Recent client requests</h2><a href="/admin/requests.php">View all</a></div>
+  <div class="panel-head"><h2>Recent client requests</h2><a href="requests.php">View all</a></div>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Name</th><th>Subject</th><th>Status</th><th>Date</th></tr></thead>
@@ -46,7 +46,7 @@ require __DIR__ . '/includes/header.php';
       <?php if (!$recentRequests): ?><tr><td colspan="4" class="empty">No requests yet.</td></tr><?php endif; ?>
       <?php foreach ($recentRequests as $r): ?>
         <tr>
-          <td><a href="/admin/requests.php?id=<?= (int)$r['id'] ?>"><?= e($r['name']) ?></a><div class="help"><?= e($r['email']) ?></div></td>
+          <td><a href="requests.php?id=<?= (int)$r['id'] ?>"><?= e($r['name']) ?></a><div class="help"><?= e($r['email']) ?></div></td>
           <td><?= e($r['subject'] ?: '—') ?></td>
           <td><?= status_badge($r['status']) ?></td>
           <td><?= e($r['created_at']) ?></td>
@@ -58,7 +58,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2>Recent bookings</h2><a href="/admin/bookings.php">Manage</a></div>
+  <div class="panel-head"><h2>Recent bookings</h2><a href="bookings.php">Manage</a></div>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Tracking</th><th>Client</th><th>Tour</th><th>Status</th><th>Progress</th></tr></thead>
@@ -66,7 +66,7 @@ require __DIR__ . '/includes/header.php';
       <?php if (!$recentBookings): ?><tr><td colspan="5" class="empty">No bookings yet.</td></tr><?php endif; ?>
       <?php foreach ($recentBookings as $b): ?>
         <tr>
-          <td><a href="/admin/bookings.php?id=<?= (int)$b['id'] ?>"><?= e($b['tracking_code']) ?></a></td>
+          <td><a href="bookings.php?id=<?= (int)$b['id'] ?>"><?= e($b['tracking_code']) ?></a></td>
           <td><?= e($b['client_name']) ?></td>
           <td><?= e($b['title']) ?></td>
           <td><?= status_badge($b['status']) ?></td>
@@ -79,7 +79,7 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <div class="panel">
-  <div class="panel-head"><h2>Activity</h2><a href="/admin/logs.php">Full log</a></div>
+  <div class="panel-head"><h2>Activity</h2><a href="logs.php">Full log</a></div>
   <div class="table-wrap">
     <table>
       <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Details</th></tr></thead>

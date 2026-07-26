@@ -2,7 +2,7 @@
 require_once dirname(__DIR__, 2) . '/apps/backend/bootstrap.php';
 
 if (Auth::admin()) {
-    redirect('/admin/index.php');
+    redirect(base_path('/admin/index.php'));
 }
 
 $error = '';
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Email and password are required.';
         } elseif (Auth::attemptAdmin($email, $password)) {
             flash('success', 'Welcome back.');
-            redirect('/admin/index.php');
+            redirect(base_path('/admin/index.php'));
         } else {
             $error = 'Invalid credentials or inactive account.';
         }
@@ -33,12 +33,12 @@ $app = config('app_name', 'Pentagon Quest');
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/assets/admin.css">
+  <link rel="stylesheet" href="assets/admin.css">
 </head>
 <body>
 <div class="auth-wrap">
   <div class="auth-card">
-    <div class="brand"><div class="brand-mark"></div><span><?= e($app) ?></span></div>
+    <div class="brand"><img class="brand-mark" src="assets/logo.png" alt=""><span><?= e($app) ?></span></div>
     <h1>Admin sign in</h1>
     <p class="sub">Manage travels, tours, bookings, and client requests.</p>
     <?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
@@ -57,8 +57,8 @@ $app = config('app_name', 'Pentagon Quest');
       <button class="btn btn-block" type="submit">Sign in</button>
     </form>
     <p style="margin-top:16px;font-size:.9rem">
-      <a href="/admin/forgot-password.php">Forgot password?</a>
-      · <a href="/admin/migrate.php">Run migrations</a>
+      <a href="forgot-password.php">Forgot password?</a>
+      · <a href="migrate.php">Run migrations</a>
     </p>
   </div>
 </div>
